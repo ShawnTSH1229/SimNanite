@@ -22,7 +22,8 @@ struct SBuildCluster
 	std::vector<DirectX::XMFLOAT3> m_positions;
 	std::vector<DirectX::XMFLOAT3> m_normals;
 	std::vector<DirectX::XMFLOAT2> m_uvs;
-	
+	std::vector<unsigned int> m_indices;
+
 	DirectX::BoundingBox m_bounding_box;
 	DirectX::XMFLOAT3 m_min_pos = DirectX::XMFLOAT3( 1e30f,  1e30f,  1e30f);
 	DirectX::XMFLOAT3 m_max_pos = DirectX::XMFLOAT3(-1e30f, -1e30f, -1e30f);
