@@ -56,7 +56,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SimNanite.cpp" />
     <ClCompile Include="SimNaniteBuilder\indexgenerator.cpp" />
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuildDAG.cpp" />
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp" />
@@ -67,7 +66,7 @@
     <ClCompile Include="SimNaniteBuilder\simplifier.cpp" />
     <ClCompile Include="SimNaniteCommon\MeshResource.cpp" />
     <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp" />
-    <ClCompile Include="SimNaniteNew.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp" />

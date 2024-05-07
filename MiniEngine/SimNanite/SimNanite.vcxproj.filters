@@ -12,6 +12,15 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{17157387-93c6-4153-83e6-c1abfd6fb95b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NaniteBuilder">
+      <UniqueIdentifier>{9cf9d6dd-07eb-4c16-9bbe-b53238b07833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NaniteCommon">
+      <UniqueIdentifier>{2b984988-badc-42de-ad05-ccbe7d840b8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NaniteRuntime">
+      <UniqueIdentifier>{a65b0610-5836-4f1b-8915-85e65d5de7da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Textures\Atrium_diffuseIBL.dds">
@@ -52,111 +61,112 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SimNanite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteBuilder\SimNaniteObjLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteBuilder\SimNaniteObjSaver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteBuilder\simplifier.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteBuilder\indexgenerator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuildDAG.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp">
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteBuilder\SimNaniteMeshSimplifier.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjLoader.cpp">
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjSaver.cpp">
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\simplifier.cpp">
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteBuilder\SimNanitePartioner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteNew.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteCommon\MeshResource.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteCommon</Filter>
     </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp">
+      <Filter>Source Files\NaniteCommon</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="SimNaniteBuilder\meshoptimizer.h">
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteBuilder\SimNaniteObjLoader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteBuilder\tiny_obj_loader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteCommon\MeshResource.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteCommon\NaniteUtils.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteBuilder\SimNaniteObjSaver.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteBuilder\simplifier.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClInclude>
-    <ClInclude Include="SimNaniteBuilder\meshoptimizer.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="SimNaniteBuilder\tiny_obj_loader.h">
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\MeshResource.h">
+      <Filter>Source Files\NaniteCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\NaniteUtils.h">
+      <Filter>Source Files\NaniteCommon</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteCommon\ShaderCompile.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteCommon</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteCommon</Filter>
     </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
