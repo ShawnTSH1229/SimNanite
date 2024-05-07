@@ -27,29 +27,35 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 	}
 
 	{
-		bool b_terminated = false;
 		int clu_level_idx = 0;
 		while (m_cluster_levels[clu_level_idx].m_merged_cluster.m_positions.size() > 128 * 3 * 8 + 10)
 		{
 			SBuildClusterLevel& current_cluster_level = m_cluster_levels[clu_level_idx];
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
+			
+
 			CSimNanitePartioner nanite_partioner;
 			nanite_partioner.PartionTriangles(last_level_merged_cluster, m_cluster_levels[clu_level_idx].m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
 			nanite_partioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, m_cluster_levels[clu_level_idx + 1].m_vtx_to_last_level_group_map);
 
 			CSimNaniteMeshSimplifier nanite_mesh_simplifier;
-			b_terminated = b_terminated || nanite_mesh_simplifier.SimplifiyMergedClusterGroup(m_cluster_levels[clu_level_idx].m_merged_cluster, m_cluster_levels[clu_level_idx + 1].m_merged_cluster);
-			if (b_terminated)
+
+			bool simplify_failed = nanite_mesh_simplifier.SimplifiyMergedClusterGroup(m_cluster_levels[clu_level_idx].m_merged_cluster, m_cluster_levels[clu_level_idx + 1].m_merged_cluster);
+
+			if (simplify_failed)
 			{
 				clu_level_idx -= 2;
 				break;
 			}
-			else
+
+			bool b_terminated = current_cluster_level.m_clusters.size() < 24;
+			if (b_terminated)
 			{
-				clu_level_idx++;
+				break;
 			}
-			
+
+			clu_level_idx++;
 		}
 
 		{
