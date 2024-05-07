@@ -1,0 +1,23 @@
+*.user
+*.suo
+*.VC.db*
+*.shader_inc
+*.vspscc
+*.opensdf
+*.sdf
+*.ipch
+*.cache
+*.tlog
+*.lastbuildstate
+*.ilk
+*.log
+* - Copy*.*
+Build_VS*
+Build
+Packages
+/ModelConverter/assimp.dll
+Packages
+
+/SimNanite/.vs/*
+/SimNaniteCore/.vs/*
+/SimNanite/summer_house_ruin/textures/*.dds

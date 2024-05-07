@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Profile|x64">
+      <Configuration>Profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <RootNamespace>SimNanite</RootNamespace>
+    <ProjectGuid>{1813BD6E-E2AF-4A3C-8C54-4E72119DA993}</ProjectGuid>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <Keyword>Win32Proj</Keyword>
+    <PlatformToolset>v142</PlatformToolset>
+    <MinimumVisualStudioVersion>16.0</MinimumVisualStudioVersion>
+    <TargetRuntime>Native</TargetRuntime>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <EmbedManifest>false</EmbedManifest>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\PropertySheets\Build.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Platform)'=='x64'" Label="PropertySheets">
+    <Import Project="..\PropertySheets\Desktop.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>H:\SimNanite\MiniEngine\ThirdParty\metis\include;..\SimNaniteCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link Condition="'$(Configuration)'=='Debug'">
+      <AdditionalOptions>/nodefaultlib:MSVCRT %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)
+	  </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="SimNanite.cpp" />
+    <ClCompile Include="SimNaniteBuilder\indexgenerator.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuildDAG.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteMeshSimplifier.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjLoader.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjSaver.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNanitePartioner.cpp" />
+    <ClCompile Include="SimNaniteBuilder\simplifier.cpp" />
+    <ClCompile Include="SimNaniteCommon\MeshResource.cpp" />
+    <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp" />
+    <ClCompile Include="SimNaniteNew.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Core/Core.vcxproj">
+      <Project>{86A58508-0D6A-4786-A32F-01A301FDC6F3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\SimNaniteCore\\SimNaniteCore.vcxproj">
+      <Project>{5d3aeefb-8789-48e5-9bd9-09c667052d09}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Textures\Atrium_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Atrium_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\CloudCommons_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\CloudCommon_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\DGarden_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\DGarden_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Garage_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Garage_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\MSPath_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\MSPath_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Stonewall_diffuseIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Stonewall_specularIBL.dds">
+      <DeploymentContent>true</DeploymentContent>
+      <DestinationFileName>%(RelativeDir)%(Filename)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SimNaniteBuilder\meshoptimizer.h" />
+    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h" />
+    <ClInclude Include="SimNaniteBuilder\SimNaniteObjLoader.h" />
+    <ClInclude Include="SimNaniteBuilder\SimNaniteObjSaver.h" />
+    <ClInclude Include="SimNaniteBuilder\simplifier.h" />
+    <ClInclude Include="SimNaniteBuilder\tiny_obj_loader.h" />
+    <ClInclude Include="SimNaniteCommon\MeshResource.h" />
+    <ClInclude Include="SimNaniteCommon\NaniteUtils.h" />
+    <ClInclude Include="SimNaniteCommon\ShaderCompile.h" />
+    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\Packages\zlib-msvc-x64.1.2.11.8900\build\native\lib_release;..\..\Packages\directxtex_desktop_win10.2019.2.7.1\lib\x64\Release;..\..\Packages\directxmesh_desktop_win10.2019.2.7.1\lib\x64\Release;..\ThirdParty\metis\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlibstatic.lib;DirectXMesh.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Platform)'=='x64'">metis.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Windows</SubSystem>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\Packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets" Condition="Exists('..\..\Packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets')" />
+    <Import Project="..\..\Packages\WinPixEventRuntime.1.0.231030001\build\WinPixEventRuntime.targets" Condition="Exists('..\..\Packages\WinPixEventRuntime.1.0.231030001\build\WinPixEventRuntime.targets')" />
+    <Import Project="..\..\Packages\directxmesh_desktop_win10.2024.2.22.1\build\native\directxmesh_desktop_win10.targets" Condition="Exists('..\..\Packages\directxmesh_desktop_win10.2024.2.22.1\build\native\directxmesh_desktop_win10.targets')" />
+    <Import Project="..\..\Packages\directxtex_desktop_win10.2024.2.22.1\build\native\directxtex_desktop_win10.targets" Condition="Exists('..\..\Packages\directxtex_desktop_win10.2024.2.22.1\build\native\directxtex_desktop_win10.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\Packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets'))" />
+    <Error Condition="!Exists('..\..\Packages\WinPixEventRuntime.1.0.231030001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\WinPixEventRuntime.1.0.231030001\build\WinPixEventRuntime.targets'))" />
+    <Error Condition="!Exists('..\..\Packages\directxmesh_desktop_win10.2024.2.22.1\build\native\directxmesh_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\directxmesh_desktop_win10.2024.2.22.1\build\native\directxmesh_desktop_win10.targets'))" />
+    <Error Condition="!Exists('..\..\Packages\directxtex_desktop_win10.2024.2.22.1\build\native\directxtex_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\directxtex_desktop_win10.2024.2.22.1\build\native\directxtex_desktop_win10.targets'))" />
+  </Target>
+</Project>

@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{17157387-93c6-4153-83e6-c1abfd6fb95b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Textures\Atrium_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Atrium_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\CloudCommon_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\CloudCommons_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\DGarden_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\DGarden_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Garage_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Garage_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\MSPath_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\MSPath_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Stonewall_diffuseIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Textures\Stonewall_specularIBL.dds">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SimNanite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteObjSaver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\simplifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\indexgenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuildDAG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteMeshSimplifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNanitePartioner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteNew.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteCommon\MeshResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\SimNaniteObjLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\tiny_obj_loader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\MeshResource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\NaniteUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\SimNaniteObjSaver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\simplifier.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\meshoptimizer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\ShaderCompile.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
