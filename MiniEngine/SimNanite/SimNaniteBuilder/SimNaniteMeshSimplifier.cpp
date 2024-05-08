@@ -25,7 +25,22 @@ bool CSimNaniteMeshSimplifier::SimplifiyMergedClusterGroup(SBuildCluster& merged
 		remapped_vertex_norm_buffer.resize(unindexed_vertex_count);
 		remapped_vertex_uv_buffer.resize(unindexed_vertex_count);
 
-		size_t vertex_count = meshopt_generateVertexRemap(remap_index_buffer.data(), nullptr, index_count, merged_cluster.m_positions.data(), unindexed_vertex_count, sizeof(DirectX::XMFLOAT3));
+		meshopt_Stream mesh_stream[3];
+
+		mesh_stream[0].data = merged_cluster.m_positions.data();
+		mesh_stream[0].size = sizeof(DirectX::XMFLOAT3);
+		mesh_stream[0].stride = sizeof(DirectX::XMFLOAT3);
+
+		mesh_stream[1].data = merged_cluster.m_normals.data();
+		mesh_stream[1].size = sizeof(DirectX::XMFLOAT3);
+		mesh_stream[1].stride = sizeof(DirectX::XMFLOAT3);
+
+		mesh_stream[2].data = merged_cluster.m_uvs.data();
+		mesh_stream[2].size = sizeof(DirectX::XMFLOAT2);
+		mesh_stream[2].stride = sizeof(DirectX::XMFLOAT2);
+
+
+		size_t vertex_count = meshopt_generateVertexRemapMulti(remap_index_buffer.data(), nullptr, index_count, merged_cluster.m_positions.size(), mesh_stream, 3);
 		meshopt_remapVertexBuffer(remapped_vertex_pos_buffer.data(), merged_cluster.m_positions.data(), unindexed_vertex_count, sizeof(DirectX::XMFLOAT3), remap_index_buffer.data());
 		meshopt_remapVertexBuffer(remapped_vertex_norm_buffer.data(), merged_cluster.m_normals.data(), unindexed_vertex_count, sizeof(DirectX::XMFLOAT3), remap_index_buffer.data());
 		meshopt_remapVertexBuffer(remapped_vertex_uv_buffer.data(), merged_cluster.m_uvs.data(), unindexed_vertex_count, sizeof(DirectX::XMFLOAT2), remap_index_buffer.data());
@@ -34,7 +49,7 @@ bool CSimNaniteMeshSimplifier::SimplifiyMergedClusterGroup(SBuildCluster& merged
 		size_t dest_index_num = meshopt_simplify(
 			simplified_index.data(), remap_index_buffer.data(), remap_index_buffer.size(),
 			(const float*)remapped_vertex_pos_buffer.data(), remapped_vertex_pos_buffer.size(),
-			sizeof(DirectX::XMFLOAT3), simplified_index.size() / 4, 1, meshopt_SimplifyLockBorder, result);
+			sizeof(DirectX::XMFLOAT3), simplified_index.size() / 2, 1, meshopt_SimplifyLockBorder, result);
 
 		int simplified_index_num = simplified_index.size();
 		simplified_cluster.m_positions.resize(dest_index_num);

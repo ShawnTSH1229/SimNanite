@@ -74,5 +74,5 @@ float4 ps_main(VSOutput vsOutput) : SV_Target0
 
     float3 result = (diffuse + specular) * baseColor.xyz;
 
-    return float4(tex_uv,diff, 1.0);
+    return float4(baseColor.xyz, 1.0);
 }

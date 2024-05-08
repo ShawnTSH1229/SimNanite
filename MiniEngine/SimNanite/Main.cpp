@@ -293,9 +293,9 @@ void SimNaniteApp::RenderScene(void)
             int instance_count = mesh_instance.m_instance_datas.size();
     
             CSimNaniteMeshResource& nanite_mesh_res = mesh_instance.m_nanite_mesh_resource;
-            uint32_t want_visualize_lod = 1;
-            //uint32_t visualize_lod = nanite_mesh_res.m_nanite_lods.size() > want_visualize_lod ? want_visualize_lod : nanite_mesh_res.m_nanite_lods.size() - 1;
-            const CSimNaniteLodResource& nanite_lod = nanite_mesh_res.m_nanite_lods[want_visualize_lod];
+            uint32_t want_visualize_lod = 4;
+           uint32_t visualize_lod = (nanite_mesh_res.m_nanite_lods.size() > want_visualize_lod) ? want_visualize_lod : nanite_mesh_res.m_nanite_lods.size() - 1;
+            const CSimNaniteLodResource& nanite_lod = nanite_mesh_res.m_nanite_lods[visualize_lod];
             for (int nanite_group_idx = 0; nanite_group_idx < nanite_lod.m_cluster_group_num; nanite_group_idx++)
             {
                 int sub_group_idx = nanite_lod.m_cluster_group_index[nanite_group_idx];

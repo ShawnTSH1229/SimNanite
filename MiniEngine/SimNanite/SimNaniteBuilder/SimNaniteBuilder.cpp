@@ -33,11 +33,9 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 			SBuildClusterLevel& current_cluster_level = m_cluster_levels[clu_level_idx];
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
-			
-
-			CSimNanitePartioner nanite_partioner;
-			nanite_partioner.PartionTriangles(last_level_merged_cluster, m_cluster_levels[clu_level_idx].m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
-			nanite_partioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, m_cluster_levels[clu_level_idx + 1].m_vtx_to_last_level_group_map);
+			CSimNanitePartitioner nanite_partitioner;
+			nanite_partitioner.PartionTriangles(last_level_merged_cluster, m_cluster_levels[clu_level_idx].m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
+			nanite_partitioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, m_cluster_levels[clu_level_idx + 1].m_vtx_to_last_level_group_map);
 
 			CSimNaniteMeshSimplifier nanite_mesh_simplifier;
 
@@ -64,7 +62,7 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 			current_cluster_level.m_clusters.resize(0);
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
-			CSimNanitePartioner nanite_partioner;
+			CSimNanitePartitioner nanite_partioner;
 			nanite_partioner.PartionTriangles(last_level_merged_cluster, current_cluster_level.m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
 
 			SBuildClusterGroup cluster_group;

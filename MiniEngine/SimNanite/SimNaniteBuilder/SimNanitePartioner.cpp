@@ -5,7 +5,7 @@
 #include <iostream>
 #include <xhash>
 
-void CSimNanitePartioner::AddEdge(uint32_t hashed_pos0, uint32_t hashed_pos1)
+void CSimNanitePartitioner::AddEdge(uint32_t hashed_pos0, uint32_t hashed_pos1)
 {
 	if (m_vtx_index_map.find(hashed_pos0) == m_vtx_index_map.end())
 	{
@@ -23,7 +23,7 @@ void CSimNanitePartioner::AddEdge(uint32_t hashed_pos0, uint32_t hashed_pos1)
 	m_vertex_ajacent_vertices[m_vtx_index_map[hashed_pos0]].m_ajacent_vertices.insert(m_vtx_index_map[hashed_pos1]);
 }
 
-void CSimNanitePartioner::PartionTriangles(const SBuildCluster& cluster_to_partition, const std::unordered_map<uint32_t, SGroupIndex>& vtx_group_map, std::vector<SBuildCluster>& out_clusters)
+void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_partition, const std::unordered_map<uint32_t, SGroupIndex>& vtx_group_map, std::vector<SBuildCluster>& out_clusters)
 {
 	m_vertex_ajacent_vertices.reserve(cluster_to_partition.m_positions.size() / 6);
 	for (int index = 0; index < cluster_to_partition.m_positions.size(); index += 3)
@@ -60,7 +60,7 @@ void CSimNanitePartioner::PartionTriangles(const SBuildCluster& cluster_to_parti
 
 	idx_t objval = 0;
 	idx_t n_weight = 1;
-	idx_t n_part = (vtx_count + 127) / 128;
+	idx_t n_part = (vtx_count + 383) / 384;
 
 	std::vector<idx_t> part_result;
 	part_result.resize(vtx_count);
@@ -211,7 +211,7 @@ void CSimNanitePartioner::PartionTriangles(const SBuildCluster& cluster_to_parti
 	m_vertex_ajacent_vertices.clear();
 }
 
-void CSimNanitePartioner::PartionClusters(std::vector<SBuildCluster>& m_clusters, std::vector<SBuildClusterGroup>& out_cluster_group, std::unordered_map<uint32_t, SGroupIndex>& out_vtx_group_map)
+void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_clusters, std::vector<SBuildClusterGroup>& out_cluster_group, std::unordered_map<uint32_t, SGroupIndex>& out_vtx_group_map)
 {
 	std::vector<idx_t> cluster_ajacent_offsets;
 	std::vector<idx_t> cluster_ajacents;
