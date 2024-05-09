@@ -69,10 +69,12 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteGlobalResource.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp" />
+    <ClCompile Include="SimNaniteRuntime\SimNaniteVisualize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Core/Core.vcxproj">
@@ -150,10 +152,12 @@
     <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteGlobalResource.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h" />
     <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h" />
+    <ClInclude Include="SimNaniteRuntime\SimNaniteVisualize.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ItemDefinitionGroup>

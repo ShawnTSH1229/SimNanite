@@ -104,6 +104,7 @@ void CreateExampleNaniteMeshInstances(
                     mesh_instance.m_instance_datas.push_back(instance_data);
                 }
             }
+            
             int num_element = mesh_instance.m_instance_datas.size();
             int element_size = sizeof(SInstanceData);
             mesh_instance.m_instance_buffer.Create(L"None", num_element, element_size, mesh_instance.m_instance_datas.data());
@@ -170,6 +171,7 @@ void CreateExampleNaniteMeshInstances(
                     mesh_instance.m_instance_datas.push_back(instance_data);
                 }
             }
+
             int num_element = mesh_instance.m_instance_datas.size();
             int element_size = sizeof(SInstanceData);
             mesh_instance.m_instance_buffer.Create(L"None", num_element, element_size, mesh_instance.m_instance_datas.data());

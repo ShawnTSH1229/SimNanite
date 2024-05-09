@@ -112,6 +112,12 @@
     <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteVisualize.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteGlobalResource.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -166,6 +172,12 @@
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteVisualize.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteGlobalResource.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,7 +46,6 @@ class SNaniteMeshInstance
 {
 public:
 	CSimNaniteMeshResource m_nanite_mesh_resource;
-	GraphicsPSO m_gfx_pso;
 
     ByteAddressBuffer m_mesh_constants_gpu;
     UploadBuffer m_mesh_constants_cpu;
