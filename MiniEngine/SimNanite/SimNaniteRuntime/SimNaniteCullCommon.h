@@ -9,7 +9,7 @@
 
 
 
-__declspec(align(256)) struct SCullingParameters
+__declspec(align(256)) struct SCullingParameters_Deprecated
 {
 	Math::BoundingPlane planes[6];
 	uint32_t total_instance_num;
@@ -25,7 +25,7 @@ struct SCullResultInfo
 	uint32_t culled_instance_num;
 };
 
-struct SNaniteInstanceSceneData
+struct SNaniteInstanceSceneData_Depracated
 {
 	Math::Matrix4 m_world;         // Object to world
 	DirectX::BoundingSphere m_bouding_sphere; //world space bounding box
@@ -37,7 +37,7 @@ struct SNaniteInstanceSceneData
 };
 
 // Persistent cull
-struct SSimNaniteCluster
+struct SSimNaniteCluster_Deprecated
 {
     DirectX::XMFLOAT3 bound_sphere_center;
     float bound_sphere_radius;
@@ -49,7 +49,7 @@ struct SSimNaniteCluster
     uint32_t start_vertex_location;
 };
 
-struct SSimNaniteClusterGroup
+struct SSimNaniteClusterGroup_deprecated
 {
     DirectX::XMFLOAT3 bound_sphere_center;
     float bound_sphere_radius;
@@ -64,7 +64,7 @@ struct SSimNaniteClusterGroup
     uint32_t cluster_start_index; // the index of the scene global cluster array
 };
 
-struct SSimNaniteMesh
+struct SSimNaniteMesh_deprecated
 {
     uint32_t lod0_cluster_group_num;
     uint32_t lod0_cluster_group_start_index;
@@ -109,7 +109,7 @@ struct SSoftwareRasterizationIndirectCommand
 };
 ;
 
-struct SQueuePassState
+struct SQueuePassState_Deprecated
 {
     uint32_t group_task_offset;
     uint32_t cluster_task_offset;

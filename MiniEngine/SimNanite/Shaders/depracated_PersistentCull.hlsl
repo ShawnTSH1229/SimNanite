@@ -17,11 +17,12 @@ struct SClusterTaskBachSize
     int clu_num;
 };
 
+// use SCullingParameters
 cbuffer PersistentCullParameter : register(b0)
 {
     float4 planes[6];
     float3 camera_world_pos;
-    uint2 global_constant_gpu_address;
+    uint2 global_constant_gpu_address;//deprecated
 }
 
 ByteAddressBuffer cluster_group_init_task_queue: register(t0);

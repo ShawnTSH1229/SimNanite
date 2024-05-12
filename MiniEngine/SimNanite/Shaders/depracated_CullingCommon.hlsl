@@ -48,14 +48,6 @@ struct SSimNaniteMesh
 {
     uint lod0_cluster_group_num;
     uint lod0_cluster_group_start_index;
-
-    //handless
-    uint2 mesh_constant_gpu_address; //b0
-    //uint2 global_constant_gpu_address; //b1
-    uint2 instance_data_gpu_address; //t0
-
-    uint2 pos_vertex_buffer_gpu_address;
-    uint2 index_buffer_gpu_address;
 };
 
 struct SHardwareRasterizationIndirectCommand

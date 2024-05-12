@@ -1,6 +1,6 @@
 #include "SimNaniteInstanceCull.h"
 
-void CInstanceCullPass::Init(SNaniteCullInitDesc& nanite_cull_init_desc, SNaniteCullingContext* nanite_cull_context)
+void CInstanceCullPass_Deprecated::Init(SNaniteCullInitDesc& nanite_cull_init_desc, SNaniteCullingContext* nanite_cull_context)
 {
 	CreatePSO(*nanite_cull_init_desc.shader_compiler);
 	BuildNaniteInstanceSceneData(*nanite_cull_init_desc.mesh_instances, *nanite_cull_init_desc.tex_heap, nanite_cull_context);
@@ -8,7 +8,7 @@ void CInstanceCullPass::Init(SNaniteCullInitDesc& nanite_cull_init_desc, SNanite
 	nanite_cull_init_desc.base_pass_ctx->culled_instance_scene_data = &m_culled_ins_scene_data_gpu;
 }
 
-void CInstanceCullPass::UpdataCullingParameters(const Frustum& frustum)
+void CInstanceCullPass_Deprecated::UpdataCullingParameters(const Frustum& frustum)
 {
 	m_cull_parameters.total_instance_num = m_nanite_instance_scene_data.size();
 	for (int plane_idx = 0; plane_idx < 6; plane_idx++)
@@ -17,15 +17,16 @@ void CInstanceCullPass::UpdataCullingParameters(const Frustum& frustum)
 	}
 }
 
-void CInstanceCullPass::GPUCull(ComputeContext& Context, SNaniteCullingContext* nanite_cull_context)
+void CInstanceCullPass_Deprecated::GPUCull(ComputeContext& Context, SNaniteCullingContext* nanite_cull_context)
 {
-	Context.ClearUAV(m_culled_instance_num);
+	
 	Context.SetRootSignature(InstanceCullRootSig);
 	Context.SetPipelineState(InstanceCullPSO);
-	Context.SetDynamicConstantBufferView(0, sizeof(SCullingParameters), &m_cull_parameters);
+	Context.SetDynamicConstantBufferView(0, sizeof(SCullingParameters_Deprecated), &m_cull_parameters);
 
 	Context.TransitionResource(m_culled_ins_scene_data_gpu, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	Context.TransitionResource(m_culled_instance_num, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	Context.ClearUAV(m_culled_instance_num);
 	Context.SetDynamicDescriptors(1, 0, 1, &m_culled_ins_scene_data_gpu.GetUAV());
 	Context.SetDynamicDescriptors(1, 1, 1, &m_culled_instance_num.GetUAV());
 	Context.SetDynamicDescriptors(1, 2, 1, &nanite_cull_context->m_queue_pass_state->GetUAV());
@@ -35,7 +36,7 @@ void CInstanceCullPass::GPUCull(ComputeContext& Context, SNaniteCullingContext* 
 	Context.Dispatch((m_cull_parameters.total_instance_num + 64 - 1) / 64, 1, 1);
 }
 
-void CInstanceCullPass::CreatePSO(CShaderCompiler& shader_compiler)
+void CInstanceCullPass_Deprecated::CreatePSO(CShaderCompiler& shader_compiler)
 {
 	InstanceCullRootSig.Reset(3);
 	InstanceCullRootSig[0].InitAsConstantBuffer(0);
@@ -49,7 +50,7 @@ void CInstanceCullPass::CreatePSO(CShaderCompiler& shader_compiler)
 	InstanceCullPSO.Finalize();
 }
 
-void CInstanceCullPass::BuildNaniteInstanceSceneData(std::vector<SNaniteMeshInstance>& mesh_instances, DescriptorHeap& tex_heap, SNaniteCullingContext* nanite_cull_context)
+void CInstanceCullPass_Deprecated::BuildNaniteInstanceSceneData(std::vector<SNaniteMeshInstance>& mesh_instances, DescriptorHeap& tex_heap, SNaniteCullingContext* nanite_cull_context)
 {
 	int total_instance_num = 0;
 	for (int mesh_idx = 0; mesh_idx < mesh_instances.size(); mesh_idx++)
@@ -62,7 +63,7 @@ void CInstanceCullPass::BuildNaniteInstanceSceneData(std::vector<SNaniteMeshInst
 	for (int mesh_idx = 0; mesh_idx < mesh_instances.size(); mesh_idx++)
 	{
 		SNaniteMeshInstance& mesh_instance = mesh_instances[mesh_idx];
-		SNaniteInstanceSceneData instance_scene_data = {};
+		SNaniteInstanceSceneData_Depracated instance_scene_data = {};
 		instance_scene_data.m_nanite_resource_id = mesh_idx;
 		for (int ins_idx = 0; ins_idx < mesh_instance.m_instance_datas.size(); ins_idx++)
 		{
@@ -77,8 +78,8 @@ void CInstanceCullPass::BuildNaniteInstanceSceneData(std::vector<SNaniteMeshInst
 	}
 
 	{
-		m_ins_scene_data_gpu.Create(L"None", m_nanite_instance_scene_data.size(), sizeof(SNaniteInstanceSceneData), m_nanite_instance_scene_data.data());
-		m_culled_ins_scene_data_gpu.Create(L"None", m_nanite_instance_scene_data.size(), sizeof(SNaniteInstanceSceneData), nullptr);
+		m_ins_scene_data_gpu.Create(L"None", m_nanite_instance_scene_data.size(), sizeof(SNaniteInstanceSceneData_Depracated), m_nanite_instance_scene_data.data());
+		m_culled_ins_scene_data_gpu.Create(L"None", m_nanite_instance_scene_data.size(), sizeof(SNaniteInstanceSceneData_Depracated), nullptr);
 		m_culled_instance_num.Create(L"None", 1, sizeof(SCullResultInfo), nullptr);
 
 		GraphicsContext& InitContext = GraphicsContext::Begin();

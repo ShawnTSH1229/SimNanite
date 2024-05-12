@@ -47,13 +47,12 @@ class SNaniteMeshInstance
 public:
 	CSimNaniteMeshResource m_nanite_mesh_resource;
 
-    ByteAddressBuffer m_mesh_constants_gpu;
-    UploadBuffer m_mesh_constants_cpu;
-
+    
     TextureRef m_texture;
     uint32_t m_tex_table_index;
     uint32_t m_sampler_table_idx;
 
+    // used in no nanite rendering
     ByteAddressBuffer m_vertex_pos_buffer;
     ByteAddressBuffer m_vertex_norm_buffer;
     ByteAddressBuffer m_vertex_uv_buffer;

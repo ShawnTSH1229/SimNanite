@@ -118,6 +118,12 @@
     <ClCompile Include="SimNaniteRuntime\SimNaniteGlobalResource.cpp">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCulling.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCulling.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -147,9 +153,6 @@
     <ClInclude Include="SimNaniteCommon\ShaderCompile.h">
       <Filter>Source Files\NaniteCommon</Filter>
     </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h">
-      <Filter>Source Files\NaniteCommon</Filter>
-    </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
@@ -168,9 +171,6 @@
     <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
-    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
@@ -178,6 +178,18 @@
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteGlobalResource.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h">
+      <Filter>Source Files\NaniteCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCulling.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCulling.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
   </ItemGroup>

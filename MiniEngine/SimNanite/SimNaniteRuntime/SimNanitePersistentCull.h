@@ -42,9 +42,9 @@ private:
     ComputePSO IndirectCmdGenPSO;
 
 
-    std::vector<SSimNaniteMesh>m_scene_mesh_infos_cpu;
-    std::vector<SSimNaniteCluster>m_scene_cluster_infos_cpu;
-    std::vector<SSimNaniteClusterGroup> m_scene_cluster_group_infos_cpu;
+    std::vector<SSimNaniteMesh_deprecated>m_scene_mesh_infos_cpu;
+    std::vector<SSimNaniteCluster_Deprecated>m_scene_cluster_infos_cpu;
+    std::vector<SSimNaniteClusterGroup_deprecated> m_scene_cluster_group_infos_cpu;
     
     SPersistentCullParameter m_persistentCullParameter;
 

@@ -122,7 +122,7 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 			DirectX::XMFLOAT3 extents = DirectX::XMFLOAT3(max_pos.x - center.x, max_pos.y - center.y, max_pos.z - center.z);
 
 			cluster_group_resource.m_bouding_box = DirectX::BoundingBox(center, extents);
-			cluster_group_resource.cluster_next_lod_dist = clu_level_idx * 80;
+			cluster_group_resource.cluster_next_lod_dist = clu_level_idx * 40;
 
 			cluster_group_resource.m_cluster_num = clu_group.m_cluster_indices.size();
 			for (const auto& clu_idx : clu_group.m_cluster_indices)
@@ -152,7 +152,8 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 				const SBuildClusterGroup& clu_group = next_level.m_cluster_groups[next_level_cluster_group_idx];
 				for (int next_level_clu_idx = 0; next_level_clu_idx < clu_group.m_cluster_indices.size(); next_level_clu_idx++)
 				{
-					const SBuildCluster& next_cluster = next_level.m_clusters[next_level_clu_idx];
+					int next_clu_idx = clu_group.m_cluster_indices[next_level_clu_idx];
+					const SBuildCluster& next_cluster = next_level.m_clusters[next_clu_idx];
 					for (int face_group_idx = 0; face_group_idx < next_cluster.face_parent_cluster_group.size(); face_group_idx++)
 					{
 						int parent_clu_group_idx = next_cluster.face_parent_cluster_group[face_group_idx];

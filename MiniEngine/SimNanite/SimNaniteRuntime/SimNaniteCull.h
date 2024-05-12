@@ -11,7 +11,7 @@ public:
 	void UpdataCullingParameters(const Frustum& frustum, DirectX::XMFLOAT3 camera_world_pos);
 	void GPUCull(ComputeContext& Context, uint64_t gloabl_view_constant_gpu_address);
 private:
-	CInstanceCullPass m_instance_cull_pass;
+	CInstanceCullPass_Deprecated m_instance_cull_pass;
 	CPersistentCullPass m_persistent_cull_pass;
 	SNaniteCullingContext m_nanite_cull_context;
 };

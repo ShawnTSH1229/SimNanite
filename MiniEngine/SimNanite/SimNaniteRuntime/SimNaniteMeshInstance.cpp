@@ -6,7 +6,7 @@ static void CreateBuffer(ByteAddressBuffer& out_buf, void* data, int num_element
 {
     int buffer_size = num_element * element_size;
     UploadBuffer upload;
-    upload.Create(L"None", buffer_size);
+    upload.Create(L"vertex buffer", buffer_size);
     memcpy(upload.Map(), data, buffer_size);
     upload.Unmap();
     out_buf.Create(L"Mesh Buffer", num_element, element_size, upload);
@@ -26,6 +26,8 @@ void CreateExampleNaniteMeshInstances(
     TextureRef default_tex;
     uint32_t tex_table_idx;
     uint32_t sampler_table_idx;
+
+    bool forece_rebuild = false;
 
     //texture
     {
@@ -57,7 +59,7 @@ void CreateExampleNaniteMeshInstances(
     {
         SNaniteMeshInstance& mesh_instance = out_mesh_instances[0];
         CSimNaniteMeshResource& nanite_mesh_resource = mesh_instance.m_nanite_mesh_resource;
-        nanite_mesh_resource.LoadFrom(std::string("bunny/bunny.obj"), std::wstring(L"bunny/bunny.obj"), false);
+        nanite_mesh_resource.LoadFrom(std::string("bunny/bunny.obj"), std::wstring(L"bunny/bunny.obj"), forece_rebuild);
         
         //buffer
         CreateBuffer(mesh_instance.m_vertex_pos_buffer, nanite_mesh_resource.m_positions.data(),
@@ -76,22 +78,6 @@ void CreateExampleNaniteMeshInstances(
         mesh_instance.m_tex_table_index = tex_table_idx;
         mesh_instance.m_sampler_table_idx = sampler_table_idx;
 
-        // constant buffer
-        {
-            mesh_instance.m_mesh_constants_cpu.Create(L"Mesh Constant Upload Buffer", 1 * 1 * sizeof(MeshConstants));
-            mesh_instance.m_mesh_constants_gpu.Create(L"Mesh Constant GPU Buffer", 1 * 1, sizeof(SNaniteMeshConstants));
-
-            MeshConstants* cb = (MeshConstants*)mesh_instance.m_mesh_constants_cpu.Map();
-            MeshConstants& cbv = cb[0];
-            cbv.World = Matrix4(Vector4(1, 0, 0, 0), Vector4(0, 1, 0, 0), Vector4(0, 0, 1, 0), Vector4(0, 0, 0, 1));
-            cbv.WorldIT = InverseTranspose(cbv.World.Get3x3());
-            mesh_instance.m_mesh_constants_cpu.Unmap();
-
-            gfxContext.TransitionResource(mesh_instance.m_mesh_constants_gpu, D3D12_RESOURCE_STATE_COPY_DEST, true);
-            gfxContext.GetCommandList()->CopyBufferRegion(mesh_instance.m_mesh_constants_gpu.GetResource(), 0, mesh_instance.m_mesh_constants_cpu.GetResource(), 0, mesh_instance.m_mesh_constants_cpu.GetBufferSize());
-            gfxContext.TransitionResource(mesh_instance.m_mesh_constants_gpu, D3D12_RESOURCE_STATE_GENERIC_READ);
-        }
-
         {
             for (int x = 0; x < 8; x++)
             {
@@ -104,6 +90,12 @@ void CreateExampleNaniteMeshInstances(
                     mesh_instance.m_instance_datas.push_back(instance_data);
                 }
             }
+
+            SInstanceData instance_data;
+            instance_data.World = Matrix4(Vector4(1, 0, 0, 0), Vector4(0, 1, 0, 0), Vector4(0, 0, 1, 0), Vector4(0, 0, 0, 1));
+            instance_data.World = Matrix4::MakeScale(50.0) * Matrix4(AffineTransform(Vector3(5, -2, 5)));
+            instance_data.WorldIT = InverseTranspose(instance_data.World.Get3x3());
+            mesh_instance.m_instance_datas.push_back(instance_data);
             
             int num_element = mesh_instance.m_instance_datas.size();
             int element_size = sizeof(SInstanceData);
@@ -124,7 +116,7 @@ void CreateExampleNaniteMeshInstances(
     {
         SNaniteMeshInstance& mesh_instance = out_mesh_instances[1];
         CSimNaniteMeshResource& nanite_mesh_resource = mesh_instance.m_nanite_mesh_resource;
-        nanite_mesh_resource.LoadFrom(std::string("teapot/teapot.obj"), std::wstring(L"teapot/teapot.obj"), false);
+        nanite_mesh_resource.LoadFrom(std::string("teapot/teapot.obj"), std::wstring(L"teapot/teapot.obj"), forece_rebuild);
 
         //buffer
         CreateBuffer(mesh_instance.m_vertex_pos_buffer, nanite_mesh_resource.m_positions.data(),
@@ -143,22 +135,6 @@ void CreateExampleNaniteMeshInstances(
         mesh_instance.m_tex_table_index = tex_table_idx;
         mesh_instance.m_sampler_table_idx = sampler_table_idx;
 
-        // constant buffer
-        {
-            mesh_instance.m_mesh_constants_cpu.Create(L"Mesh Constant Upload Buffer", 1 * 1 * sizeof(MeshConstants));
-            mesh_instance.m_mesh_constants_gpu.Create(L"Mesh Constant GPU Buffer", 1 * 1, sizeof(SNaniteMeshConstants));
-
-            MeshConstants* cb = (MeshConstants*)mesh_instance.m_mesh_constants_cpu.Map();
-            MeshConstants& cbv = cb[0];
-            cbv.World = Matrix4(Vector4(1, 0, 0, 0), Vector4(0, 1, 0, 0), Vector4(0, 0, 1, 0), Vector4(0, 0, 0, 1));
-            cbv.WorldIT = InverseTranspose(cbv.World.Get3x3());
-            mesh_instance.m_mesh_constants_cpu.Unmap();
-
-            gfxContext.TransitionResource(mesh_instance.m_mesh_constants_gpu, D3D12_RESOURCE_STATE_COPY_DEST, true);
-            gfxContext.GetCommandList()->CopyBufferRegion(mesh_instance.m_mesh_constants_gpu.GetResource(), 0, mesh_instance.m_mesh_constants_cpu.GetResource(), 0, mesh_instance.m_mesh_constants_cpu.GetBufferSize());
-            gfxContext.TransitionResource(mesh_instance.m_mesh_constants_gpu, D3D12_RESOURCE_STATE_GENERIC_READ);
-        }
-
         {
             for (int x = 0; x < 10; x++)
             {
@@ -174,7 +150,7 @@ void CreateExampleNaniteMeshInstances(
 
             int num_element = mesh_instance.m_instance_datas.size();
             int element_size = sizeof(SInstanceData);
-            mesh_instance.m_instance_buffer.Create(L"None", num_element, element_size, mesh_instance.m_instance_datas.data());
+            mesh_instance.m_instance_buffer.Create(L"m_instance_buffer", num_element, element_size, mesh_instance.m_instance_datas.data());
 
             {
                 DescriptorHandle instance_buffer_handles = tex_heap.Alloc(1);

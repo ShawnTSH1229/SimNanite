@@ -60,7 +60,7 @@ void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_par
 
 	idx_t objval = 0;
 	idx_t n_weight = 1;
-	idx_t n_part = (vtx_count + 383) / 384;
+	idx_t n_part = (vtx_count + 254) / 256; //todo: fix me ! we should use indexed vertex buffer to partition triangles
 
 	std::vector<idx_t> part_result;
 	part_result.resize(vtx_count);
@@ -136,7 +136,9 @@ void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_par
 		}
 
 		// avoid overlap
-		idx_t min_part = (std::min)((std::min)(part_a, part_b), part_c);
+		
+		idx_t min_part = (out_clusters[part_a].m_positions.size() < out_clusters[part_b].m_positions.size()) ? part_a : part_b;
+		min_part = (out_clusters[min_part].m_positions.size() < out_clusters[part_c].m_positions.size()) ? min_part : part_c;
 
 		out_clusters[min_part].m_positions.push_back(vtx_a);
 		out_clusters[min_part].m_positions.push_back(vtx_b);

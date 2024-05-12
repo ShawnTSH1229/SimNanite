@@ -24,11 +24,15 @@
 #include "SimNaniteCommon/ShaderCompile.h"
 #include "TextureConvert.h"
 #include "SimNaniteRuntime/SimNaniteMeshInstance.h"
-#include "SimNaniteRuntime/SimNaniteCull.h"
-#include "SimNaniteRuntime/SimNaniteRasterizer.h"
-#include "SimNaniteRuntime/SimNaniteBasePass.h"
+#include "SimNaniteRuntime/SimNaniteInstanceCulling.h"
+#include "SimNaniteRuntime/SimNanitePersistentCulling.h"
 #include "SimNaniteRuntime/SimNaniteGlobalResource.h"
 #include "SimNaniteRuntime/SimNaniteVisualize.h"
+
+//deprecated
+//#include "SimNaniteRuntime/SimNaniteCull.h"
+//#include "SimNaniteRuntime/SimNaniteRasterizer.h"
+//#include "SimNaniteRuntime/SimNaniteBasePass.h"
 
 #define DEBUG_TEST 0
 
@@ -57,12 +61,15 @@ private:
 
     //SNaniteBasePassContext nanite_base_pass_ctx;
 
-    CNaniteCuller m_nanite_culler;
-    CSimNaniteRasterizer m_nanite_rasterizer;
-    CSimNaniteBasePass m_nanite_base_pass;
+    CSimNaniteInstanceCulling m_instance_culling;
+    CPersistentCulling m_persistent_culling;
     CSimNaniteVisualizer m_nanite_visualizer;
 
 #if DEBUG_TEST
+    CNaniteCuller m_nanite_culler;
+    CSimNaniteRasterizer m_nanite_rasterizer;
+    CSimNaniteBasePass m_nanite_base_pass;
+
     SBuildCluster total_mesh_cluster;
 #endif
 };
@@ -100,7 +107,12 @@ void SimNaniteApp::Startup(void)
 
     CreateExampleNaniteMeshInstances(GetSimNaniteGlobalResource().m_mesh_instances, GetSimNaniteGlobalResource().s_TextureHeap, GetSimNaniteGlobalResource().s_SamplerHeap);
     
+    InitGlobalResource();
+
     m_nanite_visualizer.Init();
+    m_instance_culling.Init();
+    m_persistent_culling.Init();
+
 #if 0
     SNaniteCullInitDesc culler_init_desc;
     culler_init_desc.mesh_instances = &m_mesh_instances;
@@ -141,6 +153,11 @@ void SimNaniteApp::Update(float deltaT)
     else if (GameInput::IsFirstPressed(GameInput::kRShoulder))
         DebugZoom.Increment();
 
+#if 0
+    m_nanite_culler.UpdataCullingParameters(m_Camera.GetWorldSpaceFrustum(), DirectX::XMFLOAT3(cam_position.GetX(), cam_position.GetY(), cam_position.GetZ()));
+#endif
+    m_CameraController->Update(deltaT);
+
     if (GameInput::IsFirstPressed(GameInput::kKey_5))
     {
         GetSimNaniteGlobalResource().m_vis_cluster_lod++;
@@ -151,11 +168,30 @@ void SimNaniteApp::Update(float deltaT)
         GetSimNaniteGlobalResource().m_vis_cluster_lod--;
     }
 
+    if (GameInput::IsFirstPressed(GameInput::kKey_7))
+    {
+        GetSimNaniteGlobalResource().vis_type = 7;
+    }
+    GetSimNaniteGlobalResource().vis_type = 7;
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_0))
+    {
+        GetSimNaniteGlobalResource().vis_type = 0;
+    }
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_1))
+    {
+        GetSimNaniteGlobalResource().m_need_update_freezing_data = true;
+    }
+
     const Vector3 cam_position = m_Camera.GetPosition();
-#if 0
-    m_nanite_culler.UpdataCullingParameters(m_Camera.GetWorldSpaceFrustum(), DirectX::XMFLOAT3(cam_position.GetX(), cam_position.GetY(), cam_position.GetZ()));
-#endif
-    m_CameraController->Update(deltaT);
+    SCullingParameters& culling_parameters = GetSimNaniteGlobalResource().m_culling_parameters;
+    culling_parameters.m_camera_world_position = cam_position;
+    culling_parameters.m_total_instance_num = GetSimNaniteGlobalResource().m_nanite_instance_scene_data.size();
+    for (int plane_idx = 0; plane_idx < 6; plane_idx++)
+    {
+        culling_parameters.m_planes[plane_idx] = m_Camera.GetWorldSpaceFrustum().GetFrustumPlane(Frustum::PlaneID(plane_idx));
+    }
 }
 
 void SimNaniteApp::RenderScene(void)
@@ -167,18 +203,19 @@ void SimNaniteApp::RenderScene(void)
     globals.CameraPos = m_Camera.GetPosition();
     globals.SunDirection = Math::Vector3(1, 1, 1);
     globals.SunIntensity = Math::Vector3(1, 1, 1);
-
     globals.RenderTargetSizeX = g_SceneColorBuffer.GetWidth();
     globals.RenderTargetSizeY = g_SceneColorBuffer.GetHeight();
 
     DynAlloc cb = cptContext.ReserveUploadMemory(sizeof(SNanitrGlobalConstants));
     memcpy(cb.DataPtr, &globals, sizeof(SNanitrGlobalConstants));
     GetSimNaniteGlobalResource().m_view_constant_address = cb.GpuAddress;
-    //m_nanite_culler.GPUCull(cptContext, cb.GpuAddress);
+    
+    m_instance_culling.Culling(cptContext);
+    m_persistent_culling.GPUCull(cptContext);
+
     cptContext.Finish();
     
-    //nanite_base_pass_ctx.m_nanite_gloabl_constant_address = cb.GpuAddress;
-    //m_nanite_base_pass.Render(&nanite_base_pass_ctx);
+    
     
     m_nanite_visualizer.Render();
   

@@ -28,13 +28,20 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 
 	{
 		int clu_level_idx = 0;
-		while (m_cluster_levels[clu_level_idx].m_merged_cluster.m_positions.size() > 128 * 3 * 8 + 10)
+		while (true)
 		{
 			SBuildClusterLevel& current_cluster_level = m_cluster_levels[clu_level_idx];
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
 			CSimNanitePartitioner nanite_partitioner;
 			nanite_partitioner.PartionTriangles(last_level_merged_cluster, m_cluster_levels[clu_level_idx].m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
+
+			bool b_terminated = current_cluster_level.m_clusters.size() < 30;
+			if (b_terminated)
+			{
+				break;
+			}
+
 			nanite_partitioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, m_cluster_levels[clu_level_idx + 1].m_vtx_to_last_level_group_map);
 
 			CSimNaniteMeshSimplifier nanite_mesh_simplifier;
@@ -44,12 +51,6 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 			if (simplify_failed)
 			{
 				clu_level_idx -= 2;
-				break;
-			}
-
-			bool b_terminated = current_cluster_level.m_clusters.size() < 24;
-			if (b_terminated)
-			{
 				break;
 			}
 

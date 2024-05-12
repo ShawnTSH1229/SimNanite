@@ -127,16 +127,16 @@ void CPersistentCullPass::GPUCull(ComputeContext& Context, SNaniteCullingContext
 
 void CPersistentCullPass::InitBuffer(SNaniteCullInitDesc& nanite_cull_init_desc, SNaniteCullingContext* nanite_cull_context)
 {
-	m_queue_pass_state.Create(L"None", 1, sizeof(SQueuePassState), nullptr);
+	m_queue_pass_state.Create(L"None", 1, sizeof(SQueuePassState_Deprecated), nullptr);
 	nanite_cull_context->m_queue_pass_state = &m_queue_pass_state;
 
 	int cluster_group_init_task_num = TEST_CLUSTER_GROUP_PER_LOD * 1 * TEST_MAX_INSTANCE_NUM_PER_MESH * TEST_MAX_MESH_NUM;
 	m_cluster_group_init_task_queue.Create(L"None", cluster_group_init_task_num, sizeof(uint32_t) * 2, nullptr);
 
 	BuildScneneData(nanite_cull_init_desc);
-	m_scene_mesh_infos.Create(L"None", m_scene_mesh_infos_cpu.size(), sizeof(SSimNaniteMesh), m_scene_mesh_infos_cpu.data());
-	m_scene_cluster_infos.Create(L"None", m_scene_cluster_infos_cpu.size(), sizeof(SSimNaniteCluster), m_scene_cluster_infos_cpu.data());
-	m_scene_cluster_group_infos.Create(L"None", m_scene_cluster_group_infos_cpu.size(), sizeof(SSimNaniteClusterGroup), m_scene_cluster_group_infos_cpu.data());
+	m_scene_mesh_infos.Create(L"None", m_scene_mesh_infos_cpu.size(), sizeof(SSimNaniteMesh_deprecated), m_scene_mesh_infos_cpu.data());
+	m_scene_cluster_infos.Create(L"None", m_scene_cluster_infos_cpu.size(), sizeof(SSimNaniteCluster_Deprecated), m_scene_cluster_infos_cpu.data());
+	m_scene_cluster_group_infos.Create(L"None", m_scene_cluster_group_infos_cpu.size(), sizeof(SSimNaniteClusterGroup_deprecated), m_scene_cluster_group_infos_cpu.data());
 	
 	int cluster_group_task_num = TEST_CLUSTER_GROUP_PER_LOD * 5 * TEST_MAX_INSTANCE_NUM_PER_MESH * TEST_MAX_MESH_NUM;
 	cluster_group_task_queue.Create(L"None", cluster_group_task_num, sizeof(uint32_t) * 2, nullptr);
@@ -176,11 +176,11 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 		SNaniteMeshInstance& mesh_instance = mesh_instances[mesh_idx];
 		CSimNaniteMeshResource& mesh_resource = mesh_instance.m_nanite_mesh_resource;
 
-		SSimNaniteMesh nanite_mesh_gpu;
+		SSimNaniteMesh_deprecated nanite_mesh_gpu;
 		nanite_mesh_gpu.lod0_cluster_group_num = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_num;
 		nanite_mesh_gpu.lod0_cluster_group_start_index = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_index[0];
 
-		nanite_mesh_gpu.mesh_constant_gpu_address = mesh_instance.m_mesh_constants_gpu.GetGpuVirtualAddress();
+		//nanite_mesh_gpu.mesh_constant_gpu_address = mesh_instance.m_mesh_constants_gpu.GetGpuVirtualAddress();
 		nanite_mesh_gpu.instance_data_gpu_address = mesh_instance.m_instance_buffer.GetGpuVirtualAddress();
 		nanite_mesh_gpu.pos_vertex_buffer_gpu_address = mesh_instance.m_vertex_pos_buffer.GetGpuVirtualAddress();
 		nanite_mesh_gpu.index_buffer_gpu_address = mesh_instance.m_index_buffer.GetGpuVirtualAddress();
@@ -193,7 +193,7 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 			DirectX::BoundingSphere bounding_sphere;
 			DirectX::BoundingSphere::CreateFromBoundingBox(bounding_sphere, nanite_cluster_group_resource.m_bouding_box);
 
-			SSimNaniteClusterGroup nanite_cluster_group;
+			SSimNaniteClusterGroup_deprecated nanite_cluster_group;
 			nanite_cluster_group.bound_sphere_center = bounding_sphere.Center;
 			nanite_cluster_group.bound_sphere_radius = bounding_sphere.Radius;
 
@@ -215,7 +215,7 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 			DirectX::BoundingSphere bounding_sphere;
 			DirectX::BoundingSphere::CreateFromBoundingBox(bounding_sphere, nanite_cluster_resource.m_bouding_box);
 
-			SSimNaniteCluster nanite_cluster;
+			SSimNaniteCluster_Deprecated nanite_cluster;
 			nanite_cluster.bound_sphere_center = bounding_sphere.Center;
 			nanite_cluster.bound_sphere_radius = bounding_sphere.Radius;
 
@@ -229,7 +229,7 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 		scene_cluster_group_info_idx += mesh_resource.m_cluster_groups.size();
 		scene_cluster_info_idx += mesh_resource.m_clusters.size();
 	}
-	m_scene_mesh_infos.Create(L"None", scene_mesh_infos_size, sizeof(SSimNaniteMesh), m_scene_mesh_infos_cpu.data());
+	m_scene_mesh_infos.Create(L"None", scene_mesh_infos_size, sizeof(SSimNaniteMesh_deprecated), m_scene_mesh_infos_cpu.data());
 }
 
 void CPersistentCullPass::CreatePSO(CShaderCompiler& shader_compiler)
