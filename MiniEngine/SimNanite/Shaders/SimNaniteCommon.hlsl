@@ -24,8 +24,8 @@ struct SQueuePassState
     uint group_task_write_offset;
     uint cluster_task_write_offset;
 
-    uint clu_group_num;
-    uint init_clu_group_num;
+    int clu_group_num;
+    int init_clu_group_num;
 
     uint global_dispatch_indirect_size;
 };
@@ -91,6 +91,12 @@ struct SIndirectDrawParameters
     uint start_instance_location;
 };
 
+struct SClusterGroupCullVis
+{
+    uint cluster_num;
+    uint cluster_start_index;
+    uint culled_instance_index;
+};
 
 float DistanceFromPoint(float4 plane, float3 in_point)
 {

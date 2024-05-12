@@ -161,6 +161,10 @@ static void InitPersistentCullGPUResource()
 	gSimNaniteResource.m_scene_normal_vertex_buffer.Create(L"m_scene_normal_vertex_buffer", normal_data.size(), sizeof(XMFLOAT3), normal_data.data());
 	gSimNaniteResource.m_scene_uv_vertex_buffer.Create(L"m_scene_uv_vertex_buffer", uv_data.size(), sizeof(XMFLOAT2), uv_data.data());
 	gSimNaniteResource.m_scene_index_buffer.Create(L"m_scene_index_buffer", indices_data.size(), sizeof(unsigned int), indices_data.data());
+
+	int cluster_group_task_num = SIM_NANITE_CLUSTER_GROUP_PER_LOD * 5 * SIM_NANITE_MAX_INSTANCE_NUM_PER_MESH * SIM_NANITE_MAX_MESH_NUM;
+	gSimNaniteResource.m_cluster_group_cull_vis.Create(L"cluster_group_cull_vis", cluster_group_task_num, sizeof(SClusterGroupCullVis));
+	gSimNaniteResource.m_cluster_group_culled_num.Create(L"m_cluster_group_culled_num",1,sizeof(uint32_t));
 }
 
 void InitGlobalResource()

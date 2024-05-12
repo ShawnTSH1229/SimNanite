@@ -1,6 +1,16 @@
 #pragma once
 #include "SimNaniteMeshInstance.h"
 
+#define SIM_NANITE_MAX_CLUSTER_BATCH_PER_MESH 64 /* =  2048 Cluster / 32 */
+#define SIM_NANITE_MAX_INSTANCE_NUM_PER_MESH 100
+#define SIM_NANITE_MAX_MESH_NUM 4 
+#define SIM_NANITE_CLUSTER_GROUP_PER_LOD 8
+#define SIM_NANITE_MAX_LOD 5
+
+
+
+#define CLUGROUP_CULL_DEBUG 1
+
 __declspec(align(256)) struct SCullingParameters
 {
 	Math::BoundingPlane m_planes[6];
@@ -77,6 +87,13 @@ struct SSimNaniteMesh
 	uint32_t lod0_cluster_group_start_index;
 };
 
+struct SClusterGroupCullVis
+{
+	uint32_t cluster_num;
+	uint32_t cluster_start_index;
+	uint32_t culled_instance_index;
+};
+
 struct SSimNaniteGlobalResource
 {
 	// Initialized In App Setup
@@ -117,6 +134,9 @@ struct SSimNaniteGlobalResource
 	ByteAddressBuffer m_scene_uv_vertex_buffer;
 	ByteAddressBuffer m_scene_index_buffer;
 
+	// Visualize Cluster Group
+	StructuredBuffer m_cluster_group_cull_vis;
+	ByteAddressBuffer m_cluster_group_culled_num;
 
 	// Debug variable
 	// 5 / 2 increase decrease cluster visualize lod

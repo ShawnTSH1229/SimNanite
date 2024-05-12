@@ -30,6 +30,4 @@ void InitPersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIn
             out_cluster_group_task_queue.Store2(gloabl_task_write_index + write_idx, uint2(index,lod0_cluster_group_start_index + write_idx));
         }
     }
-
-
 }
