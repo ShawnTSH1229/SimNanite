@@ -34,15 +34,14 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
 			CSimNanitePartitioner nanite_partitioner;
-			nanite_partitioner.PartionTriangles(last_level_merged_cluster, m_cluster_levels[clu_level_idx].m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
+			nanite_partitioner.PartionTriangles(last_level_merged_cluster, current_cluster_level.m_clusters);
 
-			bool b_terminated = current_cluster_level.m_clusters.size() < 30;
-			if (b_terminated)
+			if (current_cluster_level.m_clusters.size() < 32)
 			{
 				break;
 			}
 
-			nanite_partitioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, m_cluster_levels[clu_level_idx + 1].m_vtx_to_last_level_group_map);
+			nanite_partitioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups);
 
 			CSimNaniteMeshSimplifier nanite_mesh_simplifier;
 
@@ -64,14 +63,8 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 			SBuildCluster& last_level_merged_cluster = current_cluster_level.m_merged_cluster;
 
 			CSimNanitePartitioner nanite_partioner;
-			nanite_partioner.PartionTriangles(last_level_merged_cluster, current_cluster_level.m_vtx_to_last_level_group_map, current_cluster_level.m_clusters);
-
-			SBuildClusterGroup cluster_group;
-			for (int clu_idx = 0; clu_idx < current_cluster_level.m_clusters.size(); clu_idx++)
-			{
-				cluster_group.m_cluster_indices.push_back(clu_idx);
-			}
-			current_cluster_level.m_cluster_groups.push_back(cluster_group);
+			nanite_partioner.PartionTriangles(last_level_merged_cluster, current_cluster_level.m_clusters);
+			nanite_partioner.PartionClusters(current_cluster_level.m_clusters, current_cluster_level.m_cluster_groups, true);
 			clu_level_idx++;
 		}
 
@@ -81,7 +74,9 @@ void CSimNaniteBuilder::Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshR
 
 	// Build DAG
 	BuildDAG(out_nanite_reousource);
+	BuildBVH(out_nanite_reousource);
 
+	out_nanite_reousource.m_header.m_bvh_nodes_size = out_nanite_reousource.m_bvh_nodes.size();
 	out_nanite_reousource.m_header.m_index_count = out_nanite_reousource.m_indices.size();
 	out_nanite_reousource.m_header.m_cluster_group_size = out_nanite_reousource.m_cluster_groups.size();
 	out_nanite_reousource.m_header.m_cluster_size = out_nanite_reousource.m_clusters.size();

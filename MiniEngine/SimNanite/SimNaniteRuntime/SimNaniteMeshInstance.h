@@ -46,7 +46,6 @@ class SNaniteMeshInstance
 {
 public:
 	CSimNaniteMeshResource m_nanite_mesh_resource;
-
     
     TextureRef m_texture;
     uint32_t m_tex_table_index;

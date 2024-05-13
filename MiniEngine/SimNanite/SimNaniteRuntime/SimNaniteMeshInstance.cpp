@@ -27,7 +27,7 @@ void CreateExampleNaniteMeshInstances(
     uint32_t tex_table_idx;
     uint32_t sampler_table_idx;
 
-    bool forece_rebuild = false;
+    bool forece_rebuild = true;
 
     //texture
     {

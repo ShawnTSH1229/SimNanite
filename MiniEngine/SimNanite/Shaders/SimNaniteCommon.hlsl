@@ -18,15 +18,13 @@ struct SNaniteInstanceSceneData
 
 struct SQueuePassState
 {
-    uint group_task_offset;
+    uint node_task_offset;
     uint cluster_task_offset;
 
-    uint group_task_write_offset;
+    uint node_task_write_offset;
     uint cluster_task_write_offset;
 
-    int clu_group_num;
-    int init_clu_group_num;
-
+    int node_num;
     uint global_dispatch_indirect_size;
 };
 
@@ -49,10 +47,8 @@ struct SSimNaniteClusterGroup
     float3 bound_sphere_center;
     float bound_sphere_radius;
 
+    float cluster_pre_lod_dist;
     float cluster_next_lod_dist; // the last lod dist is infinite
-
-    uint child_group_num;
-    uint child_group_start_index[8]; // the index of the scene global cluster group array
 
     uint cluster_num;
     uint cluster_start_index; // the index of the scene global cluster array
@@ -60,8 +56,21 @@ struct SSimNaniteClusterGroup
 
 struct SSimNaniteMesh
 {
-    uint lod0_cluster_group_num;
-    uint lod0_cluster_group_start_index;
+    uint root_node_num;
+    uint root_node_indices[8]; // max lod number
+};
+
+struct SSimNaniteBVHNode
+{
+    uint child_node_indices[4];
+    float3 bound_sphere_center;
+    float bound_sphere_radius;
+
+    uint is_leaf_node;
+    uint clu_group_idx;
+
+    uint padding_0;
+    uint padding_1;
 };
 
 // indirect draw

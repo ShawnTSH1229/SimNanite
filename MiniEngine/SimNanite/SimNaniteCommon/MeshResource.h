@@ -5,7 +5,13 @@
 #include <DirectXCollision.h>
 #include <string>
 
-
+struct SClusterGroupBVHNode
+{
+	bool m_is_leaf_node;
+	uint32_t m_cluster_group_index;
+	uint32_t m_child_node_index[4];
+	DirectX::BoundingBox m_bouding_box;
+};
 
 struct CSimNaniteClusterResource
 {
@@ -19,11 +25,10 @@ struct CSimNaniteClusterResource
 struct CSimNaniteClusterGrpupResource
 {
 	DirectX::BoundingBox m_bouding_box;
+	float cluster_pre_lod_dist;
 	float cluster_next_lod_dist;
-	int m_child_group_num;
-	int m_cluster_num;
 
-	std::vector<int>m_child_group_indices;
+	int m_cluster_num;
 	std::vector<int>m_clusters_indices;
 
 	typedef void (*group_serialize_fun)(char*, long long, void* streaming);
@@ -33,13 +38,15 @@ struct CSimNaniteClusterGrpupResource
 struct CSimNaniteLodResource
 {
 	int m_cluster_group_num;
-	int m_cluster_group_index[8];
+	int m_cluster_group_start;
+	uint32_t m_root_node_index;
 };
 
 struct SSimNaniteMeshHeader
 {
 	int m_vertex_count;
 	int m_index_count;
+	int m_bvh_nodes_size;
 	int m_cluster_group_size;
 	int m_cluster_size;
 	int m_lod_size;
@@ -57,6 +64,7 @@ public:
 	std::vector<DirectX::XMFLOAT2> m_uvs;
 	std::vector<unsigned int> m_indices;
 
+	std::vector<SClusterGroupBVHNode> m_bvh_nodes;
 	std::vector<CSimNaniteClusterGrpupResource> m_cluster_groups;
 	std::vector<CSimNaniteClusterResource>m_clusters;
 	std::vector<CSimNaniteLodResource> m_nanite_lods;

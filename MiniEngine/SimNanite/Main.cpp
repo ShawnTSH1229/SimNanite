@@ -186,7 +186,9 @@ void SimNaniteApp::Update(float deltaT)
 
     const Vector3 cam_position = m_Camera.GetPosition();
     SCullingParameters& culling_parameters = GetSimNaniteGlobalResource().m_culling_parameters;
-    culling_parameters.m_camera_world_position = cam_position;
+    culling_parameters.m_camera_world_position_x = cam_position.GetX();
+    culling_parameters.m_camera_world_position_y = cam_position.GetY();
+    culling_parameters.m_camera_world_position_z = cam_position.GetZ();
     culling_parameters.m_total_instance_num = GetSimNaniteGlobalResource().m_nanite_instance_scene_data.size();
     for (int plane_idx = 0; plane_idx < 6; plane_idx++)
     {

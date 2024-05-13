@@ -122,7 +122,8 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 			DirectX::XMFLOAT3 extents = DirectX::XMFLOAT3(max_pos.x - center.x, max_pos.y - center.y, max_pos.z - center.z);
 
 			cluster_group_resource.m_bouding_box = DirectX::BoundingBox(center, extents);
-			cluster_group_resource.cluster_next_lod_dist = clu_level_idx * 40;
+			cluster_group_resource.cluster_pre_lod_dist = clu_level_idx * 40;
+			cluster_group_resource.cluster_next_lod_dist = (clu_level_idx + 1) * 40;
 
 			cluster_group_resource.m_cluster_num = clu_group.m_cluster_indices.size();
 			for (const auto& clu_idx : clu_group.m_cluster_indices)
@@ -130,10 +131,10 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 				cluster_group_resource.m_clusters_indices.push_back(clu_idx + start_cluster_location);
 			}
 
-			if (clu_level_idx == clu_level_idx < m_cluster_levels.size() - 1)
+			if (clu_level_idx == ( m_cluster_levels.size() - 1))
 			{
-				cluster_group_resource.m_child_group_num = 1;
-				cluster_group_resource.m_child_group_indices.push_back(start_cluster_group_location);
+				cluster_group_resource.cluster_pre_lod_dist = clu_level_idx * 40;
+				cluster_group_resource.cluster_next_lod_dist = 1e25f;
 			}
 
 			out_nanite_reousource.m_cluster_groups.push_back(cluster_group_resource);
@@ -161,23 +162,11 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 					}
 				}
 			}
-
-			for (int clu_group_idx = start_cluster_group_location; clu_group_idx < out_nanite_reousource.m_cluster_groups.size(); clu_group_idx++)
-			{
-				CSimNaniteClusterGrpupResource& nanite_cluster_group_res = out_nanite_reousource.m_cluster_groups[clu_group_idx];
-				for (const auto& child_idx : cluster_group_child_sets[clu_group_idx - start_cluster_group_location])
-				{
-					nanite_cluster_group_res.m_child_group_indices.push_back(child_idx);
-				}
-			}
 		}
 
 		CSimNaniteLodResource nanite_lod_resource;
 		nanite_lod_resource.m_cluster_group_num = build_cluster_level.m_cluster_groups.size();
-		for (int clu_group_idx = 0; clu_group_idx < nanite_lod_resource.m_cluster_group_num; clu_group_idx++)
-		{
-			nanite_lod_resource.m_cluster_group_index[clu_group_idx] = clu_group_idx + start_cluster_group_location;
-		}
+		nanite_lod_resource.m_cluster_group_start = start_cluster_group_location;
 
 		out_nanite_reousource.m_nanite_lods.push_back(nanite_lod_resource);
 
@@ -185,10 +174,6 @@ void CSimNaniteBuilder::BuildDAG(CSimNaniteMeshResource& out_nanite_reousource)
 		start_cluster_group_location += m_cluster_levels[clu_level_idx].m_cluster_groups.size();
 	}
 
-	for (int clu_group_idx = 0; clu_group_idx < out_nanite_reousource.m_cluster_groups.size(); clu_group_idx++)
-	{
-		out_nanite_reousource.m_cluster_groups[clu_group_idx].m_child_group_num = out_nanite_reousource.m_cluster_groups[clu_group_idx].m_child_group_indices.size();
-	}
 	out_nanite_reousource.m_positions.resize(start_vertex_location);
 	out_nanite_reousource.m_normals.resize(start_vertex_location);
 	out_nanite_reousource.m_uvs.resize(start_vertex_location);

@@ -23,7 +23,7 @@ void CSimNanitePartitioner::AddEdge(uint32_t hashed_pos0, uint32_t hashed_pos1)
 	m_vertex_ajacent_vertices[m_vtx_index_map[hashed_pos0]].m_ajacent_vertices.insert(m_vtx_index_map[hashed_pos1]);
 }
 
-void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_partition, const std::unordered_map<uint32_t, SGroupIndex>& vtx_group_map, std::vector<SBuildCluster>& out_clusters)
+void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_partition, std::vector<SBuildCluster>& out_clusters)
 {
 	m_vertex_ajacent_vertices.reserve(cluster_to_partition.m_positions.size() / 6);
 	for (int index = 0; index < cluster_to_partition.m_positions.size(); index += 3)
@@ -136,7 +136,6 @@ void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_par
 		}
 
 		// avoid overlap
-		
 		idx_t min_part = (out_clusters[part_a].m_positions.size() < out_clusters[part_b].m_positions.size()) ? part_a : part_b;
 		min_part = (out_clusters[min_part].m_positions.size() < out_clusters[part_c].m_positions.size()) ? min_part : part_c;
 
@@ -161,45 +160,6 @@ void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_par
 		out_clusters[min_part].m_uvs.push_back(cluster_to_partition.m_uvs[index + 0]);
 		out_clusters[min_part].m_uvs.push_back(cluster_to_partition.m_uvs[index + 1]);
 		out_clusters[min_part].m_uvs.push_back(cluster_to_partition.m_uvs[index + 2]);
-
-
-
-		if (vtx_group_map.size() != 0)
-		{
-			const SGroupIndex group_index_a = vtx_group_map.find(hashed_pos_a)->second;
-			const SGroupIndex group_index_b = vtx_group_map.find(hashed_pos_b)->second;
-			const SGroupIndex group_index_c = vtx_group_map.find(hashed_pos_c)->second;
-
-			for (auto iter_a = group_index_a.m_group_idex.begin(); iter_a != group_index_a.m_group_idex.end(); iter_a++)
-			{
-				const int grp_idx = *iter_a;
-				bool b_find_b = false;
-				bool b_find_c = false;
-				for (auto iter_b = group_index_b.m_group_idex.begin(); iter_b != group_index_b.m_group_idex.end(); iter_b++)
-				{
-					if (grp_idx == *iter_b)
-					{
-						b_find_b = true;
-						break;
-					}
-				}
-
-				for (auto iter_c = group_index_c.m_group_idex.begin(); iter_c != group_index_c.m_group_idex.end(); iter_c++)
-				{
-					if (grp_idx == *iter_c)
-					{
-						b_find_c = true;
-						break;
-					}
-				}
-
-				if (b_find_b && b_find_c)
-				{
-					out_clusters[min_part].face_parent_cluster_group.push_back(grp_idx);
-					break;
-				}
-			}
-		}
 	}
 
 	for (auto& clu : out_clusters)
@@ -213,7 +173,7 @@ void CSimNanitePartitioner::PartionTriangles(const SBuildCluster& cluster_to_par
 	m_vertex_ajacent_vertices.clear();
 }
 
-void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_clusters, std::vector<SBuildClusterGroup>& out_cluster_group, std::unordered_map<uint32_t, SGroupIndex>& out_vtx_group_map)
+void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_clusters, std::vector<SBuildClusterGroup>& out_cluster_group, bool is_last_lod)
 {
 	std::vector<idx_t> cluster_ajacent_offsets;
 	std::vector<idx_t> cluster_ajacents;
@@ -229,10 +189,17 @@ void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_cluste
 	cluster_ajacent_offsets.push_back(cluster_ajacents.size());
 
 	idx_t n_clu_weight = 1;
-	idx_t n_clu_part = 8;
 	idx_t clu_obj_val;
-
 	idx_t clu_count = cluster_ajacent_offsets.size() - 1;
+	
+	idx_t n_clu_part = (clu_count + 7) / 8;
+	double log2_part = log2(n_clu_part);
+	double sqrt_log2 = sqrt(log2_part);
+
+	float cluster_group_num = pow(4, ceil(sqrt_log2));
+	n_clu_part = cluster_group_num;
+	n_clu_part = is_last_lod ? 4 : n_clu_part;
+
 	std::vector<idx_t> clu_part_result;
 	clu_part_result.resize(clu_count);
 
@@ -252,22 +219,5 @@ void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_cluste
 	{
 		int group_idx = clu_part_result[idx];
 		out_cluster_group[group_idx].m_cluster_indices.push_back(idx);
-
-		SBuildCluster& cluster = m_clusters[idx];
-		for (int vtx_idx = 0; vtx_idx < cluster.m_positions.size(); vtx_idx += 3)
-		{
-			DirectX::XMFLOAT3 vtx_a = cluster.m_positions[vtx_idx + 0];
-			DirectX::XMFLOAT3 vtx_b = cluster.m_positions[vtx_idx + 1];
-			DirectX::XMFLOAT3 vtx_c = cluster.m_positions[vtx_idx + 2];
-
-			uint32_t hashed_pos_a = HashPosition(vtx_a);
-			uint32_t hashed_pos_b = HashPosition(vtx_b);
-			uint32_t hashed_pos_c = HashPosition(vtx_c);
-
-			out_vtx_group_map[hashed_pos_a].m_group_idex.insert(group_idx);
-			out_vtx_group_map[hashed_pos_b].m_group_idex.insert(group_idx);
-			out_vtx_group_map[hashed_pos_c].m_group_idex.insert(group_idx);
-
-		}
 	}
 }

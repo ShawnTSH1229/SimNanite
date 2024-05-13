@@ -53,12 +53,14 @@ static void InitPersistentCullGPUResource()
 	std::vector<SSimNaniteMesh>& m_scene_mesh_infos_cpu = gSimNaniteResource.m_scene_mesh_infos_cpu;
 	std::vector<SSimNaniteCluster>& m_scene_cluster_infos_cpu = gSimNaniteResource.m_scene_cluster_infos_cpu;
 	std::vector<SSimNaniteClusterGroup>& m_scene_cluster_group_infos_cpu = gSimNaniteResource.m_scene_cluster_group_infos_cpu;
+	std::vector<SSimNaniteBVHNode> m_scene_bvh_nodes_infos_cpu = gSimNaniteResource.m_scene_bvh_nodes_infos_cpu;
 
 	std::vector<SNaniteMeshInstance>& mesh_instances = gSimNaniteResource.m_mesh_instances;
 	
 	int scene_mesh_infos_size = mesh_instances.size();
 	int scene_cluster_infos_size = 0;
 	int scene_cluster_group_info_size = 0;
+	int scene_node_info_size = 0;
 	int scene_vertex_num = 0;
 	int scene_index_num = 0;
 
@@ -67,6 +69,7 @@ static void InitPersistentCullGPUResource()
 		SNaniteMeshInstance& mesh_instance = mesh_instances[mesh_idx];
 		scene_cluster_infos_size += mesh_instance.m_nanite_mesh_resource.m_clusters.size();
 		scene_cluster_group_info_size += mesh_instance.m_nanite_mesh_resource.m_cluster_groups.size();
+		scene_node_info_size += mesh_instance.m_nanite_mesh_resource.m_bvh_nodes.size();
 		scene_vertex_num += mesh_instance.m_nanite_mesh_resource.m_positions.size();
 		scene_index_num += mesh_instance.m_nanite_mesh_resource.m_indices.size();
 	}
@@ -74,9 +77,11 @@ static void InitPersistentCullGPUResource()
 	m_scene_mesh_infos_cpu.resize(scene_mesh_infos_size);
 	m_scene_cluster_infos_cpu.resize(scene_cluster_infos_size);
 	m_scene_cluster_group_infos_cpu.resize(scene_cluster_group_info_size);
+	m_scene_bvh_nodes_infos_cpu.resize(scene_node_info_size);
 
 	int scene_cluster_group_info_idx = 0;
 	int scene_cluster_info_idx = 0;
+	int scene_node_info_idx = 0;
 
 	std::vector<DirectX::XMFLOAT3> positions_data;
 	std::vector<DirectX::XMFLOAT3> normal_data;
@@ -102,8 +107,11 @@ static void InitPersistentCullGPUResource()
 		memcpy(((uint8_t*)indices_data.data()) + index_offsets * sizeof(unsigned int), mesh_resource.m_indices.data(), mesh_resource.m_indices.size() * sizeof(unsigned int));
 
 		SSimNaniteMesh nanite_mesh_gpu;
-		nanite_mesh_gpu.lod0_cluster_group_num = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_num;
-		nanite_mesh_gpu.lod0_cluster_group_start_index = scene_cluster_group_info_idx + mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_index[0];
+		nanite_mesh_gpu.m_root_node_num = mesh_instance.m_nanite_mesh_resource.m_nanite_lods.size();
+		for (uint32_t root_idx = 0; root_idx < nanite_mesh_gpu.m_root_node_num; root_idx++)
+		{
+			nanite_mesh_gpu.m_root_node_indices[root_idx] = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[root_idx].m_root_node_index + scene_node_info_idx;
+		}
 		m_scene_mesh_infos_cpu[mesh_idx] = nanite_mesh_gpu;
 
 		for (int clu_group_idx = 0; clu_group_idx < mesh_resource.m_cluster_groups.size(); clu_group_idx++)
@@ -117,12 +125,8 @@ static void InitPersistentCullGPUResource()
 			nanite_cluster_group.bound_sphere_center = bounding_sphere.Center;
 			nanite_cluster_group.bound_sphere_radius = bounding_sphere.Radius;
 
+			nanite_cluster_group.cluster_pre_lod_dist = nanite_cluster_group_resource.cluster_pre_lod_dist;
 			nanite_cluster_group.cluster_next_lod_dist = nanite_cluster_group_resource.cluster_next_lod_dist;
-			nanite_cluster_group.child_group_num = nanite_cluster_group_resource.m_child_group_num;
-			for (int chd_idx = 0; chd_idx < nanite_cluster_group_resource.m_child_group_num; chd_idx++)
-			{
-				nanite_cluster_group.child_group_start_index[chd_idx] = scene_cluster_group_info_idx + nanite_cluster_group_resource.m_child_group_indices[chd_idx];
-			}
 			nanite_cluster_group.cluster_num = nanite_cluster_group_resource.m_cluster_num;
 			nanite_cluster_group.cluster_start_index = scene_cluster_info_idx + nanite_cluster_group_resource.m_clusters_indices[0];
 			m_scene_cluster_group_infos_cpu[scene_cluster_group_info_idx + clu_group_idx] = nanite_cluster_group;
@@ -146,9 +150,29 @@ static void InitPersistentCullGPUResource()
 			m_scene_cluster_infos_cpu[scene_cluster_info_idx + clu_idx] = nanite_cluster;
 		}
 
+		for (int node_idx = 0; node_idx < mesh_resource.m_bvh_nodes.size(); node_idx++)
+		{
+			const SClusterGroupBVHNode& bvh_node = mesh_resource.m_bvh_nodes[node_idx];
+
+			DirectX::BoundingSphere bounding_sphere;
+			DirectX::BoundingSphere::CreateFromBoundingBox(bounding_sphere, bvh_node.m_bouding_box);
+
+			SSimNaniteBVHNode node_info;
+			node_info.is_leaf_node = bvh_node.m_is_leaf_node;
+			node_info.bound_sphere_center = bounding_sphere.Center;
+			node_info.bound_sphere_radius = bounding_sphere.Radius;
+			node_info.child_node_indices[0] = bvh_node.m_child_node_index[0] + scene_node_info_idx;
+			node_info.child_node_indices[1] = bvh_node.m_child_node_index[1] + scene_node_info_idx;
+			node_info.child_node_indices[2] = bvh_node.m_child_node_index[2] + scene_node_info_idx;
+			node_info.child_node_indices[3] = bvh_node.m_child_node_index[3] + scene_node_info_idx;
+			node_info.clu_group_idx = scene_cluster_group_info_idx + bvh_node.m_cluster_group_index;
+			m_scene_bvh_nodes_infos_cpu[scene_node_info_idx + node_idx] = node_info;
+		}
 
 		scene_cluster_group_info_idx += mesh_resource.m_cluster_groups.size();
 		scene_cluster_info_idx += mesh_resource.m_clusters.size();
+		scene_node_info_idx += mesh_resource.m_bvh_nodes.size();
+
 		vertex_offsets += mesh_resource.m_positions.size();
 		index_offsets += mesh_resource.m_indices.size();
 	}
@@ -156,6 +180,7 @@ static void InitPersistentCullGPUResource()
 	gSimNaniteResource.m_scene_mesh_infos.Create(L"m_scene_mesh_infos", m_scene_mesh_infos_cpu.size(), sizeof(SSimNaniteMesh), m_scene_mesh_infos_cpu.data());
 	gSimNaniteResource.m_scene_cluster_infos.Create(L"m_scene_cluster_infos", m_scene_cluster_infos_cpu.size(), sizeof(SSimNaniteCluster), m_scene_cluster_infos_cpu.data());
 	gSimNaniteResource.m_scene_cluster_group_infos.Create(L"m_scene_cluster_group_infos", m_scene_cluster_group_infos_cpu.size(), sizeof(SSimNaniteClusterGroup), m_scene_cluster_group_infos_cpu.data());
+	gSimNaniteResource.m_scene_bvh_nodes_infos.Create(L"m_scene_bvh_nodes_infos", m_scene_bvh_nodes_infos_cpu.size(), sizeof(SSimNaniteBVHNode), m_scene_bvh_nodes_infos_cpu.data());
 
 	gSimNaniteResource.m_scene_pos_vertex_buffer.Create(L"m_scene_pos_vertex_buffer", positions_data.size(), sizeof(XMFLOAT3), positions_data.data());
 	gSimNaniteResource.m_scene_normal_vertex_buffer.Create(L"m_scene_normal_vertex_buffer", normal_data.size(), sizeof(XMFLOAT3), normal_data.data());

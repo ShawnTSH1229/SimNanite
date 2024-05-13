@@ -15,7 +15,9 @@ __declspec(align(256)) struct SCullingParameters
 {
 	Math::BoundingPlane m_planes[6];
 	uint32_t m_total_instance_num;
-	Math::Vector3 m_camera_world_position;
+	float m_camera_world_position_x;
+	float m_camera_world_position_y;
+	float m_camera_world_position_z;
 };
 
 struct SNaniteInstanceSceneData
@@ -32,15 +34,13 @@ struct SNaniteInstanceSceneData
 
 struct SQueuePassState
 {
-	uint32_t group_task_offset;
+	uint32_t node_task_offset;
 	uint32_t cluster_task_offset;
 
-	uint32_t group_task_write_offset;
+	uint32_t node_task_write_offset;
 	uint32_t cluster_task_write_offset;
 
-	uint32_t clu_group_num;
-	uint32_t init_clu_group_num;
-
+	uint32_t node_num;
 	uint32_t global_dispatch_indirect_size;
 };
 
@@ -72,19 +72,31 @@ struct SSimNaniteClusterGroup
 	DirectX::XMFLOAT3 bound_sphere_center;
 	float bound_sphere_radius;
 
+	float cluster_pre_lod_dist;
 	float cluster_next_lod_dist; // the last lod dist is infinite
 
-	uint32_t child_group_num;
-	uint32_t child_group_start_index[8]; // the index of the scene global cluster group array
-		
 	uint32_t cluster_num;
 	uint32_t cluster_start_index; // the index of the scene global cluster array
 };
 
 struct SSimNaniteMesh
 {
-	uint32_t lod0_cluster_group_num;
-	uint32_t lod0_cluster_group_start_index;
+	uint32_t m_root_node_num; //lod num
+	uint32_t m_root_node_indices[8];
+};
+
+struct SSimNaniteBVHNode
+{
+	uint32_t child_node_indices[4];
+	
+	DirectX::XMFLOAT3 bound_sphere_center;
+	float bound_sphere_radius;
+
+	uint32_t is_leaf_node;
+	uint32_t clu_group_idx;
+
+	uint32_t padding_0;
+	uint32_t padding_1;
 };
 
 struct SClusterGroupCullVis
@@ -125,9 +137,12 @@ struct SSimNaniteGlobalResource
 	std::vector<SSimNaniteMesh>m_scene_mesh_infos_cpu;
 	std::vector<SSimNaniteCluster>m_scene_cluster_infos_cpu;
 	std::vector<SSimNaniteClusterGroup> m_scene_cluster_group_infos_cpu;
+	std::vector<SSimNaniteBVHNode> m_scene_bvh_nodes_infos_cpu;
+	
 	StructuredBuffer m_scene_mesh_infos;
 	StructuredBuffer m_scene_cluster_infos;
 	StructuredBuffer m_scene_cluster_group_infos;
+	StructuredBuffer m_scene_bvh_nodes_infos;
 
 	ByteAddressBuffer m_scene_pos_vertex_buffer;
 	ByteAddressBuffer m_scene_normal_vertex_buffer;

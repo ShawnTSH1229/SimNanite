@@ -100,7 +100,7 @@ void CSimNaniteVisualizer::Init()
             for (int mesh_idx = 0; mesh_idx < GetSimNaniteGlobalResource().m_mesh_instances.size(); mesh_idx++)
             {
                 CSimNaniteMeshResource nanite_mesh_resource = mesh_instances[mesh_idx].m_nanite_mesh_resource;
-                uint32_t clu_group_idx = nanite_mesh_resource.m_nanite_lods[nanite_mesh_resource.m_nanite_lods.size() - 1].m_cluster_group_index[0];
+                uint32_t clu_group_idx = nanite_mesh_resource.m_nanite_lods[nanite_mesh_resource.m_nanite_lods.size() - 1].m_cluster_group_start;
                 total_instance_size += GetSimNaniteGlobalResource().m_mesh_instances[mesh_idx].m_instance_datas.size() * nanite_mesh_resource.m_cluster_groups[clu_group_idx].m_cluster_num;
             }
 
@@ -118,7 +118,7 @@ void CSimNaniteVisualizer::Init()
                 
                 //todo: fix me
                 SSimNaniteMeshLastLOD mesh_last_lod;
-                mesh_last_lod.cluster_group_start_index = global_cluster_group_num + nanite_mesh_resource.m_nanite_lods[nanite_mesh_resource.m_nanite_lods.size() - 1].m_cluster_group_index[0];
+                mesh_last_lod.cluster_group_start_index = global_cluster_group_num + nanite_mesh_resource.m_nanite_lods[nanite_mesh_resource.m_nanite_lods.size() - 1].m_cluster_group_start;
                 mesh_last_lod.cluster_group_num = nanite_mesh_resource.m_nanite_lods[nanite_mesh_resource.m_nanite_lods.size()-1].m_cluster_group_num;
                 meshes_last_lod.push_back(mesh_last_lod);
                 global_cluster_group_num += nanite_mesh_resource.m_cluster_groups.size();
@@ -190,7 +190,7 @@ void CSimNaniteVisualizer::RenderClusterVisualize()
         const CSimNaniteLodResource& nanite_lod = nanite_mesh_res.m_nanite_lods[visualize_lod];
         for (int nanite_group_idx = 0; nanite_group_idx < nanite_lod.m_cluster_group_num; nanite_group_idx++)
         {
-            int sub_group_idx = nanite_lod.m_cluster_group_index[nanite_group_idx];
+            int sub_group_idx = nanite_lod.m_cluster_group_start + nanite_group_idx;
             const CSimNaniteClusterGrpupResource& nanite_group = nanite_mesh_res.m_cluster_groups[sub_group_idx];
 
             for (int clu_idx = 0; clu_idx < nanite_group.m_cluster_num; clu_idx++)

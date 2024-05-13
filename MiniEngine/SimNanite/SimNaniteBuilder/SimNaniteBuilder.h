@@ -46,7 +46,7 @@ struct SBuildClusterLevel
 {
 	std::vector<SBuildClusterGroup> m_cluster_groups;
 	std::vector<SBuildCluster> m_clusters;
-	std::unordered_map<uint32_t, SGroupIndex> m_vtx_to_last_level_group_map;
+	//std::unordered_map<uint32_t, SGroupIndex> m_vtx_to_last_level_group_map;
 	SBuildCluster m_merged_cluster; // merged cluster, used to mesh simplify
 };
 
@@ -61,8 +61,8 @@ public:
 class CSimNanitePartitioner
 {
 public:
-	void PartionTriangles(const SBuildCluster& cluster_to_partition, const std::unordered_map<uint32_t, SGroupIndex>& vtx_group_map, std::vector<SBuildCluster>& out_clusters);
-	void PartionClusters(std::vector<SBuildCluster>& m_clusters_ptr,std::vector<SBuildClusterGroup>& out_cluster_group, std::unordered_map<uint32_t, SGroupIndex>& out_vtx_group_map);
+	void PartionTriangles(const SBuildCluster& cluster_to_partition, std::vector<SBuildCluster>& out_clusters);
+	void PartionClusters(std::vector<SBuildCluster>& m_clusters_ptr, std::vector<SBuildClusterGroup>& out_cluster_group, bool is_last_lod = false);
 private:
 	void AddEdge(uint32_t hashed_pos0, uint32_t hashed_pos1);
 	std::unordered_map<uint32_t, uint32_t> m_vtx_index_map;
@@ -75,6 +75,7 @@ public:
 	void Build(SBuildCluster& total_mesh_cluster, CSimNaniteMeshResource& out_nanite_reousource);
 private:
 	void BuildDAG(CSimNaniteMeshResource& out_nanite_reousource);
+	void BuildBVH(CSimNaniteMeshResource& out_nanite_reousource);
 
 	std::vector<SBuildClusterLevel> m_cluster_levels;
 	SBuildClusterGroup m_init_cluster_groups;

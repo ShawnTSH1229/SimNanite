@@ -178,7 +178,7 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 
 		SSimNaniteMesh_deprecated nanite_mesh_gpu;
 		nanite_mesh_gpu.lod0_cluster_group_num = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_num;
-		nanite_mesh_gpu.lod0_cluster_group_start_index = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_index[0];
+		nanite_mesh_gpu.lod0_cluster_group_start_index = mesh_instance.m_nanite_mesh_resource.m_nanite_lods[0].m_cluster_group_start;
 
 		//nanite_mesh_gpu.mesh_constant_gpu_address = mesh_instance.m_mesh_constants_gpu.GetGpuVirtualAddress();
 		nanite_mesh_gpu.instance_data_gpu_address = mesh_instance.m_instance_buffer.GetGpuVirtualAddress();
@@ -198,11 +198,11 @@ void CPersistentCullPass::BuildScneneData(SNaniteCullInitDesc& nanite_cull_init_
 			nanite_cluster_group.bound_sphere_radius = bounding_sphere.Radius;
 
 			nanite_cluster_group.cluster_next_lod_dist = nanite_cluster_group_resource.cluster_next_lod_dist;
-			nanite_cluster_group.child_group_num = nanite_cluster_group_resource.m_child_group_num;
-			for (int chd_idx = 0; chd_idx < nanite_cluster_group_resource.m_child_group_num; chd_idx++)
-			{
-				nanite_cluster_group.child_group_index[chd_idx] = scene_cluster_group_info_idx + nanite_cluster_group_resource.m_child_group_indices[chd_idx];
-			}
+			//nanite_cluster_group.child_group_num = nanite_cluster_group_resource.m_child_group_num;
+			//for (int chd_idx = 0; chd_idx < nanite_cluster_group_resource.m_child_group_num; chd_idx++)
+			//{
+			//	nanite_cluster_group.child_group_index[chd_idx] = scene_cluster_group_info_idx + nanite_cluster_group_resource.m_child_group_indices[chd_idx];
+			//}
 			nanite_cluster_group.cluster_num = nanite_cluster_group_resource.m_cluster_num;
 			nanite_cluster_group.cluster_start_index = scene_cluster_info_idx + nanite_cluster_group_resource.m_clusters_indices[0];
 			m_scene_cluster_group_infos_cpu.push_back(nanite_cluster_group);
