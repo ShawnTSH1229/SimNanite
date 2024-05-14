@@ -124,6 +124,9 @@
     <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCulling.cpp">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClCompile>
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuildBVH.cpp">
+      <Filter>Source Files\NaniteBuilder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

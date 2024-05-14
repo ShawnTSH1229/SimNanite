@@ -1,9 +1,8 @@
+#include "SimNaniteCommon.hlsl"
 StructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(t0);
 ByteAddressBuffer cluster_group_culled_num: register(t1);
 StructuredBuffer<SSimNaniteCluster> scene_cluster_infos : register(t2);
 StructuredBuffer<SNaniteInstanceSceneData> culled_instance_scene_data: register(t3);
-
-
 
 RWStructuredBuffer<SSimNaniteClusterDraw> vis_clu_group_culled_cluster: register(u0);
 RWByteAddressBuffer vis_cul_group_cmd_num : register(u1); //todo: clear
@@ -35,7 +34,7 @@ void GenerateClusterGroupCullVisCmd(uint3 groupId : SV_GroupID, uint groupIndex 
             cluster_draw.start_index_location = cluster_info.start_index_location;
             cluster_draw.start_vertex_location = cluster_info.start_vertex_location;
 
-            vis_instance_culled_cluster[write_index] = cluster_draw;
+            vis_clu_group_culled_cluster[write_index] = cluster_draw;
             write_index++;
         }
     }

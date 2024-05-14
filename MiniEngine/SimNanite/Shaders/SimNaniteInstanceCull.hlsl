@@ -36,8 +36,8 @@ void CSMain(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
     if(index == 0)
     {
         SQueuePassState queuePassState;
-        queuePassState.nodetask_offset = 0;
-        queuePassState.cluster_task_offset = 0;
+        queuePassState.node_task_read_offset = 0;
+        queuePassState.cluster_task_read_offset = 0;
 
         queuePassState.node_task_write_offset = 0;
         queuePassState.cluster_task_write_offset = 0;

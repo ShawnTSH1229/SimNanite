@@ -10,19 +10,19 @@
 
 
 
-std::shared_ptr<SCompiledShaderCode> CShaderCompiler::Compile(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount)
+std::shared_ptr<SCompiledShaderCode> CShaderCompiler::Compile(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount)
 {
     if (m_use_fxc)
     {
-        return CompileFxc(shaderPath, pEntryPoint, pTargetProfile, dxcDefine, defineCount);
+        return CompileFxc(shaderPath, pEntryPoint, pTargetProfile, fxcDefine, defineCount);
     }
     else
     {
-        return CompileDxc(shaderPath, pEntryPoint, pTargetProfile, dxcDefine, defineCount);
+        return CompileDxc(shaderPath, pEntryPoint, pTargetProfile, fxcDefine, defineCount);
     }
 }
 
-std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileDxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount)
+std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileDxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount)
 {
     std::ifstream shader_file(shaderPath);
 
@@ -41,8 +41,10 @@ std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileDxc(const std::wstr
     IDxcBlobPtr blob_ptr;
     IDxcOperationResultPtr valid_result_ptr;
 
+    ASSERT(defineCount == 0);
+
     ASSERT_SUCCEEDED(m_library_ptr->CreateBlobWithEncodingFromPinned((LPBYTE)shader.c_str(), (uint32_t)shader.size(), 0, &text_blob_ptr));
-    ASSERT_SUCCEEDED(m_dxc_compiler_ptr->Compile(text_blob_ptr, shaderPath.data(), pEntryPoint, pTargetProfile, nullptr, 0, dxcDefine, defineCount, nullptr, &result_ptr));
+    ASSERT_SUCCEEDED(m_dxc_compiler_ptr->Compile(text_blob_ptr, shaderPath.data(), pEntryPoint, pTargetProfile, nullptr, 0, nullptr, 0, nullptr, &result_ptr));
     ASSERT_SUCCEEDED(result_ptr->GetStatus(&result_code));
 
     if (FAILED(result_code))
@@ -70,7 +72,7 @@ std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileDxc(const std::wstr
     return ret_code;
 }
 
-std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileFxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount)
+std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileFxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount)
 {
     ID3DBlobPtr code_gen;
     ID3DBlobPtr errors;
@@ -79,7 +81,16 @@ std::shared_ptr<SCompiledShaderCode> CShaderCompiler::CompileFxc(const std::wstr
 
     std::vector<D3D_SHADER_MACRO>defines;
     defines.resize(defineCount);
+    for (int def_idx = 0; def_idx < defineCount; def_idx++)
+    {
+        defines[def_idx] = fxcDefine[def_idx];
+    }
 
+    D3D_SHADER_MACRO end_macro;
+    end_macro.Definition = NULL;
+    end_macro.Name = NULL;
+    defines.push_back(end_macro);
+ 
     char enret_u8[MAX_PATH];
     char target_u8[MAX_PATH];
 

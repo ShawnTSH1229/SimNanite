@@ -1,6 +1,8 @@
 #include "SimNaniteCommon.hlsl"
 
-#define DEBUG_CLUSTER_GROUP 1
+#ifndef DEBUG_CLUSTER_GROUP
+#define DEBUG_CLUSTER_GROUP 0
+#endif
 
 #define GROUP_SIZE 32
 #define GROUP_PROCESS_NODE_NUM GROUP_SIZE
@@ -19,9 +21,13 @@ StructuredBuffer<SNaniteInstanceSceneData> culled_instance_scene_data: register(
 
 RWByteAddressBuffer node_task_queue: register(u0);//todo: insert a barrier for waw resource
 globallycoherent RWStructuredBuffer<SQueuePassState> queue_pass_state: register(u1);
+RWByteAddressBuffer cluster_task_queue: register(u1); 
+RWByteAddressBuffer cluster_task_batch_size: register(u2); 
+
+
 #if DEBUG_CLUSTER_GROUP
-RWStructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(u2);
-RWByteAddressBuffer cluster_group_culled_num: register(u3); //todo: clear
+RWStructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(u3);
+RWByteAddressBuffer cluster_group_culled_num: register(u4); //todo: clear
 #endif
 
 
@@ -51,10 +57,7 @@ void ProcessNode(uint instance_index,uint node_index)
             in_frustum = in_frustum && (DistanceFromPoint(planes[i], bounding_center) + bounding_radius > 0.0f);
         }
 
-        if(in_frustum == false)
-        {
-           is_culled = true;
-        }
+        if(in_frustum == false) { is_culled = true; }
     }
 
     // hzb culling
@@ -62,14 +65,15 @@ void ProcessNode(uint instance_index,uint node_index)
 
     }
 
-     int node_task_change_num = -1;
+    int node_task_change_num = -1;
     if(is_culled == false)
     {
-        if(bvh_node.is_leaf_node)
+        if(bvh_node.is_leaf_node == 1)
         {
             float dist = distance(bounding_center, camera_world_pos);
             uint clu_group_index = bvh_node.clu_group_idx;
             SSimNaniteClusterGroup clu_group = scene_cluster_group_infos[clu_group_index];
+            
             if(dist < clu_group.cluster_next_lod_dist && dist > clu_group.cluster_pre_lod_dist)
             {
                 #if DEBUG_CLUSTER_GROUP
@@ -82,12 +86,14 @@ void ProcessNode(uint instance_index,uint node_index)
                 cluster_group_vis.culled_instance_index = instance_index;
                 cluster_group_cull_vis[debug_write_index] = cluster_group_vis;
                 #endif
+
+
+                
             }
         }
         else
         {
-            uint write_offset;
-            //todo: wave vote optimization
+            uint write_offset; //todo: wave vote optimization
             InterlockedAdd(queue_pass_state[0].node_task_write_offset, 4, write_offset);
 
             for(uint cld_node_idx = 0; cld_node_idx < 4; cld_node_idx++)
@@ -95,7 +101,6 @@ void ProcessNode(uint instance_index,uint node_index)
                 uint2 write_node_task = uint2(instance_index, bvh_node.child_node_indices[cld_node_idx]);
                 node_task_queue.Store2((write_offset + cld_node_idx) * 8 /* sizeof(uint2)*/, write_node_task);
             }
-
             node_task_change_num += 4;
         }
     }
@@ -115,7 +120,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
     uint node_processed_size = GROUP_PROCESS_NODE_NUM;
 
     //while(true)
-    for(int debug_idx = 0; debug_idx < 50; debug_idx++)
+    for(int debug_idx = 0; debug_idx < 2000; debug_idx++)
     {
         GroupMemoryBarrierWithGroupSync();
         
@@ -133,7 +138,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
             {
                 if(group_index == 0)
                 {
-                    InterlockedAdd(queue_pass_state[0].node_task_offset, GROUP_PROCESS_NODE_NUM, group_start_node_idx);
+                    InterlockedAdd(queue_pass_state[0].node_task_read_offset, GROUP_PROCESS_NODE_NUM, group_start_node_idx);
                 }
                 GroupMemoryBarrierWithGroupSync();
 
@@ -145,7 +150,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
             bool is_node_ready = (node_processed_size + group_index) < GROUP_PROCESS_NODE_NUM;
 
             uint2 group_task = node_task_queue.Load2(node_task_index * 8);
-            is_node_ready = is_node_ready && (group_task.x != 0) && (group_task.y != 0);
+            is_node_ready = is_node_ready && ((group_task.x != 0) || (group_task.y != 0));
 
             const uint group_task_instance_index = group_task.x;
             const uint group_task_node_index = group_task.y;
@@ -165,8 +170,9 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
                 if (group_index < uint(batch_node_size))
                 {
                     ProcessNode(group_task_instance_index, group_task_node_index);
+                    node_task_queue.Store2(node_task_index * 8 /* sizeof(uint2)*/, uint2(0, 0));
                 }
-                node_processed_size += int(batch_node_size);
+                node_processed_size += batch_node_size;
                 continue;
             }
         }   

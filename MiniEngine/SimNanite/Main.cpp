@@ -172,7 +172,11 @@ void SimNaniteApp::Update(float deltaT)
     {
         GetSimNaniteGlobalResource().vis_type = 7;
     }
-    GetSimNaniteGlobalResource().vis_type = 7;
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_6))
+    {
+        GetSimNaniteGlobalResource().vis_type = 6;
+    }
 
     if (GameInput::IsFirstPressed(GameInput::kKey_0))
     {

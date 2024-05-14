@@ -100,7 +100,7 @@ void GenerateInstaceCullVisCmd(uint3 groupId : SV_GroupID, uint groupIndex : SV_
         uint write_index = 0;
         vis_instance_cmd_num.InterlockedAdd(0, clu_total_num, write_index);
 
-        for(uint clu_group_idx = cluster_group_start_index; clu_group_idx < (cluster_group_start_index + cluster_group_num); clu_group_idx ++)
+        for(uint clu_group_idx = cluster_group_start_index; clu_group_idx < (cluster_group_start_index + cluster_group_num); clu_group_idx++)
         {
             SSimNaniteClusterGroup clu_group = scene_cluster_group_infos[clu_group_idx];
 

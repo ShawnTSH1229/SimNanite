@@ -100,7 +100,7 @@ void CSimNaniteMeshResource::LoadFrom(const std::string& source_file_an, const s
         in_file.read((char*)m_uvs.data(), m_uvs.size() * sizeof(DirectX::XMFLOAT2));
         in_file.read((char*)m_indices.data(), m_indices.size() * sizeof(unsigned int));
         
-        for (int clu_idx = 0; clu_idx < m_header.m_cluster_size; clu_idx++)
+        for (int clu_idx = 0; clu_idx < m_header.m_bvh_nodes_size; clu_idx++)
         {
             in_file.read((char*)m_bvh_nodes.data(), m_bvh_nodes.size() * sizeof(SClusterGroupBVHNode));
         }

@@ -9,7 +9,7 @@
 
 
 
-#define CLUGROUP_CULL_DEBUG 1
+#define CLUGROUP_CULL_DEBUG 0
 
 __declspec(align(256)) struct SCullingParameters
 {

@@ -57,6 +57,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SimNaniteBuilder\indexgenerator.cpp" />
+    <ClCompile Include="SimNaniteBuilder\SimNaniteBuildBVH.cpp" />
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuildDAG.cpp" />
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuilder.cpp" />
     <ClCompile Include="SimNaniteBuilder\SimNaniteMeshSimplifier.cpp" />

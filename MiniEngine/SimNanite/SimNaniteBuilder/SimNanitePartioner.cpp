@@ -220,4 +220,26 @@ void CSimNanitePartitioner::PartionClusters(std::vector<SBuildCluster>& m_cluste
 		int group_idx = clu_part_result[idx];
 		out_cluster_group[group_idx].m_cluster_indices.push_back(idx);
 	}
+
+	int total_idx = 0;
+
+	// sort the clusters
+	std::vector<SBuildCluster> clusters;
+	for (int clu_grp_idx = 0; clu_grp_idx < n_clu_part; clu_grp_idx++)
+	{
+		SBuildClusterGroup& clu_grp = out_cluster_group[clu_grp_idx];
+		for (int clu_idx = 0; clu_idx < clu_grp.m_cluster_indices.size(); clu_idx++)
+		{
+			int unsord_clu_idx = clu_grp.m_cluster_indices[clu_idx];
+			clusters.push_back(m_clusters[unsord_clu_idx]);
+		}
+
+		for (int clu_idx = 0; clu_idx < clu_grp.m_cluster_indices.size(); clu_idx++)
+		{
+			clu_grp.m_cluster_indices[clu_idx] = total_idx + clu_idx;
+		}
+		total_idx += clu_grp.m_cluster_indices.size();
+	}
+
+	m_clusters = clusters;
 }

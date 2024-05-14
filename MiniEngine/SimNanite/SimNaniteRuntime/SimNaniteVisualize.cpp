@@ -104,11 +104,11 @@ void CSimNaniteVisualizer::Init()
                 total_instance_size += GetSimNaniteGlobalResource().m_mesh_instances[mesh_idx].m_instance_datas.size() * nanite_mesh_resource.m_cluster_groups[clu_group_idx].m_cluster_num;
             }
 
-            vis_instance_cull_cluster_draw.Create(L"vis_instance_culled_cluster", total_instance_size, sizeof(SSimNaniteClusterDraw));
+            vis_instance_cull_cluster_draw.Create(L"vis_instance_culled_cluster", total_instance_size * 4, sizeof(SSimNaniteClusterDraw));
             vis_instance_cull_cmd_num.Create(L"vis_instance_cull_cmd_num", 1, sizeof(uint32_t));
             vis_instance_cull_indirect_draw_cmd.Create(L"vis_instance_cull_indirect_draw_cmd", 1, sizeof(D3D12_DRAW_ARGUMENTS));
 
-            uint32_t global_cluster_group_num = 0;
+            uint32_t global_cluster_group_num = 1;
             std::vector<SSimNaniteMeshLastLOD> meshes_last_lod;
 
             
@@ -127,11 +127,37 @@ void CSimNaniteVisualizer::Init()
             vis_instance_cull_mesh_last_lod.Create(L"vis_instance_cull_mesh_last_lod", meshes_last_lod.size(), sizeof(SSimNaniteMeshLastLOD), meshes_last_lod.data());
         }
     }
+
+#if CLUGROUP_CULL_DEBUG
+    {
+        m_vis_node_cull_cmd_sig.Reset(1);
+        m_vis_node_cull_cmd_sig[0].Draw();
+        m_vis_node_cull_cmd_sig.Finalize();
+
+        {
+            m_gen_vis_node_cull_root_sig.Reset(2, 0);
+            m_gen_vis_node_cull_root_sig[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 4);
+            m_gen_vis_node_cull_root_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 2);
+            m_gen_vis_node_cull_root_sig.Finalize(L"m_gen_vis_node_cull_root_sig");
+
+            std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteVisualizeClusterGroupCull.hlsl", L"GenerateClusterGroupCullVisCmd", L"cs_5_1", nullptr, 0);
+
+            m_gen_vis_node_cull_pso = ComputePSO(L"m_gen_vis_node_cull_pso");
+            m_gen_vis_node_cull_pso.SetRootSignature(m_gen_vis_node_cull_root_sig);
+            m_gen_vis_node_cull_pso.SetComputeShader(p_cs_shader_code->GetBufferPointer(), p_cs_shader_code->GetBufferSize());
+            m_gen_vis_node_cull_pso.Finalize();
+        }
+
+        vis_clu_group_culled_cluster.Create(L"vis_clu_group_culled_cluster", 4096, sizeof(SSimNaniteClusterDraw));
+        vis_cul_group_cmd_num.Create(L"vis_cul_group_cmd_num", 1, sizeof(uint32_t));
+        vis_node_cull_indirect_draw_cmd.Create(L"vis_node_cull_indirect_draw_cmd", 1, sizeof(D3D12_DRAW_ARGUMENTS));
+    }
+#endif
 }
 
 void CSimNaniteVisualizer::Render()
 {
-    if (GetSimNaniteGlobalResource().m_need_update_freezing_data)
+    //if (GetSimNaniteGlobalResource().m_need_update_freezing_data)
     {
         UpdateFreezingData();
         GetSimNaniteGlobalResource().m_need_update_freezing_data = false;
@@ -141,6 +167,12 @@ void CSimNaniteVisualizer::Render()
     {
         RenderInstanceCullingVisualize();
     }
+#if DEBUG_CLUSTER_GROUP
+    else if (GetSimNaniteGlobalResource().vis_type == 6)
+    {
+        RenderNodeCullingVisualize();
+    }
+#endif
     else
     {
         RenderClusterVisualize();
@@ -218,7 +250,6 @@ void CSimNaniteVisualizer::UpdateFreezingData()
     ComputeContext& cptContext = ComputeContext::Begin(L"Visualize Instance Cull");
 
     {
-        
         cptContext.SetRootSignature(m_gen_vis_ins_cull_root_sig);
         cptContext.SetPipelineState(m_gen_vis_ins_cull_pso);
 
@@ -259,41 +290,118 @@ void CSimNaniteVisualizer::UpdateFreezingData()
 
         cptContext.Dispatch(1, 1, 1);
     }
+#if CLUGROUP_CULL_DEBUG
+    {
+        cptContext.SetRootSignature(m_gen_vis_node_cull_root_sig);
+        cptContext.SetPipelineState(m_gen_vis_node_cull_pso);
 
+        cptContext.TransitionResource(GetSimNaniteGlobalResource(). m_cluster_group_cull_vis, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        cptContext.TransitionResource(GetSimNaniteGlobalResource().m_cluster_group_culled_num, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        cptContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_cluster_infos, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        cptContext.TransitionResource(GetSimNaniteGlobalResource().m_culled_ins_scene_data_gpu, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+        cptContext.TransitionResource(vis_clu_group_culled_cluster, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+        cptContext.TransitionResource(vis_cul_group_cmd_num, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+        cptContext.ClearUAV(vis_cul_group_cmd_num);
+        cptContext.FlushResourceBarriers();
+
+        cptContext.SetDynamicDescriptors(0, 0, 1, &GetSimNaniteGlobalResource().m_cluster_group_cull_vis.GetSRV());
+        cptContext.SetDynamicDescriptors(0, 1, 1, &GetSimNaniteGlobalResource().m_cluster_group_culled_num.GetSRV());
+        cptContext.SetDynamicDescriptors(0, 2, 1, &GetSimNaniteGlobalResource().m_scene_cluster_infos.GetSRV());
+        cptContext.SetDynamicDescriptors(0, 3, 1, &GetSimNaniteGlobalResource().m_culled_ins_scene_data_gpu.GetSRV());
+
+        cptContext.SetDynamicDescriptors(1, 0, 1, &vis_clu_group_culled_cluster.GetUAV());
+        cptContext.SetDynamicDescriptors(1, 1, 1, &vis_cul_group_cmd_num.GetUAV());
+
+        cptContext.Dispatch((GetSimNaniteGlobalResource().m_culling_parameters.m_total_instance_num * 32 + 64 - 1) / 64, 1, 1);
+    }
+
+    {
+        cptContext.SetRootSignature(m_gen_vis_ins_cull_cmd_root_sig);
+        cptContext.SetPipelineState(m_gen_vis_ins_cull_cmd_pso);
+
+        cptContext.TransitionResource(vis_cul_group_cmd_num, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        cptContext.TransitionResource(vis_node_cull_indirect_draw_cmd, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+        cptContext.FlushResourceBarriers();
+
+        cptContext.SetDynamicDescriptors(0, 0, 1, &vis_cul_group_cmd_num.GetSRV());
+        cptContext.SetDynamicDescriptors(1, 0, 1, &vis_node_cull_indirect_draw_cmd.GetUAV());
+
+        cptContext.Dispatch(1, 1, 1);
+    }
+#endif
     cptContext.Finish();
 }
 
 void CSimNaniteVisualizer::RenderInstanceCullingVisualize()
 {
-    GraphicsContext& gfxContext = GraphicsContext::Begin(L"Scene Render");
+    GraphicsContext& gfxContext = GraphicsContext::Begin(L"RenderInstanceCullingVisualize");
 
-    gfxContext.SetRootSignature(m_vis_ins_cull_root_sig);
-    gfxContext.SetPipelineState(m_vis_ins_cull_pso);
-    
-    
+    {
+        gfxContext.SetRootSignature(m_vis_ins_cull_root_sig);
+        gfxContext.SetPipelineState(m_vis_ins_cull_pso);
 
+        gfxContext.TransitionResource(vis_instance_cull_indirect_draw_cmd, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+        gfxContext.TransitionResource(vis_instance_cull_cluster_draw, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_index_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.FlushResourceBarriers();
 
-    gfxContext.TransitionResource(vis_instance_cull_indirect_draw_cmd, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
-    gfxContext.TransitionResource(vis_instance_cull_cluster_draw, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-    gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-    gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_index_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-    gfxContext.FlushResourceBarriers();
+        gfxContext.SetConstantBuffer(0, GetSimNaniteGlobalResource().m_view_constant_address);
+        gfxContext.SetDynamicDescriptors(1, 0, 1, &vis_instance_cull_cluster_draw.GetSRV());
+        gfxContext.SetDynamicDescriptors(1, 1, 1, &GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer.GetSRV());
+        gfxContext.SetDynamicDescriptors(1, 2, 1, &GetSimNaniteGlobalResource().m_scene_index_buffer.GetSRV());
 
-    gfxContext.SetConstantBuffer(0, GetSimNaniteGlobalResource().m_view_constant_address);
-    gfxContext.SetDynamicDescriptors(1, 0, 1, &vis_instance_cull_cluster_draw.GetSRV());
-    gfxContext.SetDynamicDescriptors(1, 1, 1, &GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer.GetSRV());
-    gfxContext.SetDynamicDescriptors(1, 2, 1, &GetSimNaniteGlobalResource().m_scene_index_buffer.GetSRV());
-    
-    gfxContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    gfxContext.TransitionResource(g_SceneColorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    gfxContext.TransitionResource(g_SceneDepthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    gfxContext.SetRenderTarget(g_SceneColorBuffer.GetRTV(), g_SceneDepthBuffer.GetDSV());
-    gfxContext.SetViewportAndScissor(GetSimNaniteGlobalResource().m_MainViewport, GetSimNaniteGlobalResource().m_MainScissor);
-    
-    gfxContext.ClearColor(g_SceneColorBuffer);
-    gfxContext.ClearDepth(g_SceneDepthBuffer);
-    
-    gfxContext.ExecuteIndirect(m_vis_inst_cull_cmd_sig, vis_instance_cull_indirect_draw_cmd, 0, 1, nullptr);
+        gfxContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        gfxContext.TransitionResource(g_SceneColorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+        gfxContext.TransitionResource(g_SceneDepthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        gfxContext.SetRenderTarget(g_SceneColorBuffer.GetRTV(), g_SceneDepthBuffer.GetDSV());
+        gfxContext.SetViewportAndScissor(GetSimNaniteGlobalResource().m_MainViewport, GetSimNaniteGlobalResource().m_MainScissor);
+
+        gfxContext.ClearColor(g_SceneColorBuffer);
+        gfxContext.ClearDepth(g_SceneDepthBuffer);
+
+        gfxContext.ExecuteIndirect(m_vis_inst_cull_cmd_sig, vis_instance_cull_indirect_draw_cmd, 0, 1, nullptr);
+    }
+
     
     gfxContext.Finish();
 }
+
+#if CLUGROUP_CULL_DEBUG
+void CSimNaniteVisualizer::RenderNodeCullingVisualize()
+{
+    GraphicsContext& gfxContext = GraphicsContext::Begin(L"RenderNodeCullingVisualize");
+
+    {
+        gfxContext.SetRootSignature(m_vis_ins_cull_root_sig);
+        gfxContext.SetPipelineState(m_vis_ins_cull_pso);
+
+        gfxContext.TransitionResource(vis_node_cull_indirect_draw_cmd, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+        gfxContext.TransitionResource(vis_clu_group_culled_cluster, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.TransitionResource(GetSimNaniteGlobalResource().m_scene_index_buffer, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+        gfxContext.FlushResourceBarriers();
+
+        gfxContext.SetConstantBuffer(0, GetSimNaniteGlobalResource().m_view_constant_address);
+        gfxContext.SetDynamicDescriptors(1, 0, 1, &vis_clu_group_culled_cluster.GetSRV());
+        gfxContext.SetDynamicDescriptors(1, 1, 1, &GetSimNaniteGlobalResource().m_scene_pos_vertex_buffer.GetSRV());
+        gfxContext.SetDynamicDescriptors(1, 2, 1, &GetSimNaniteGlobalResource().m_scene_index_buffer.GetSRV());
+
+        gfxContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        gfxContext.TransitionResource(g_SceneColorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+        gfxContext.TransitionResource(g_SceneDepthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        gfxContext.SetRenderTarget(g_SceneColorBuffer.GetRTV(), g_SceneDepthBuffer.GetDSV());
+        gfxContext.SetViewportAndScissor(GetSimNaniteGlobalResource().m_MainViewport, GetSimNaniteGlobalResource().m_MainScissor);
+
+        gfxContext.ClearColor(g_SceneColorBuffer);
+        gfxContext.ClearDepth(g_SceneDepthBuffer);
+
+        gfxContext.ExecuteIndirect(m_vis_inst_cull_cmd_sig, vis_node_cull_indirect_draw_cmd, 0, 1, nullptr);
+    }
+
+
+    gfxContext.Finish();
+}
+#endif

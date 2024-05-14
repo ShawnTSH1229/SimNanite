@@ -88,19 +88,12 @@ void CSimNaniteBuilder::BuildBVH(CSimNaniteMeshResource& out_nanite_reousource)
 				tree_node.m_bouding_box = merged_box;
 				bvh_nodes.push_back(tree_node);
 			};
+
 			offset += level_node_num;
 			level_node_num /= 4;
 
 			if (level_node_num == 1)
 			{
-				SClusterGroupBVHNode tree_node;
-				tree_node.m_is_leaf_node = false;
-				tree_node.m_child_node_index[0] = offset + 0;
-				tree_node.m_child_node_index[1] = offset + 1;
-				tree_node.m_child_node_index[2] = offset + 2;
-				tree_node.m_child_node_index[3] = offset + 3;
-				tree_node.m_bouding_box = out_nanite_reousource.m_bouding_box;
-				bvh_nodes.push_back(tree_node);
 				lod_resource.m_root_node_index = bvh_nodes.size() - 1;
 				break;
 			}

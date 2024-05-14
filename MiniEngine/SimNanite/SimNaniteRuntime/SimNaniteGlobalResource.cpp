@@ -76,10 +76,11 @@ static void InitPersistentCullGPUResource()
 
 	m_scene_mesh_infos_cpu.resize(scene_mesh_infos_size);
 	m_scene_cluster_infos_cpu.resize(scene_cluster_infos_size);
-	m_scene_cluster_group_infos_cpu.resize(scene_cluster_group_info_size);
+	m_scene_cluster_group_infos_cpu.resize(scene_cluster_group_info_size + 1);
 	m_scene_bvh_nodes_infos_cpu.resize(scene_node_info_size);
 
-	int scene_cluster_group_info_idx = 0;
+	m_scene_cluster_group_infos_cpu[0] = SSimNaniteClusterGroup();;
+	int scene_cluster_group_info_idx = 1;
 	int scene_cluster_info_idx = 0;
 	int scene_node_info_idx = 0;
 

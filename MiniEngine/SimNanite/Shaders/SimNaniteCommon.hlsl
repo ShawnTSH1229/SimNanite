@@ -18,8 +18,8 @@ struct SNaniteInstanceSceneData
 
 struct SQueuePassState
 {
-    uint node_task_offset;
-    uint cluster_task_offset;
+    uint node_task_read_offset;
+    uint cluster_task_read_offset;
 
     uint node_task_write_offset;
     uint cluster_task_write_offset;
@@ -105,6 +105,13 @@ struct SClusterGroupCullVis
     uint cluster_num;
     uint cluster_start_index;
     uint culled_instance_index;
+};
+
+struct SPersistentCullIndirectCmd
+{
+    uint thread_group_count_x;
+    uint thread_group_count_y;
+    uint thread_group_count_z;
 };
 
 float DistanceFromPoint(float4 plane, float3 in_point)

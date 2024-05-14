@@ -23,6 +23,7 @@ public:
 	void Init();
 	void Render();
 private:
+	void UpdateFreezingData();
 
 	// visualize mesh cluster
 	void RenderClusterVisualize();
@@ -30,8 +31,9 @@ private:
 	GraphicsPSO m_vis_cluster_pso;
 	
 	// visualize instance culling
-	void UpdateFreezingData();
+	
 	void RenderInstanceCullingVisualize();
+
 	CommandSignature m_vis_inst_cull_cmd_sig;
 
 	RootSignature m_vis_ins_cull_root_sig;
@@ -47,4 +49,17 @@ private:
 	StructuredBuffer vis_instance_cull_cluster_draw;
 	ByteAddressBuffer vis_instance_cull_cmd_num;
 	StructuredBuffer vis_instance_cull_indirect_draw_cmd;
+
+	// visualize node culling
+#if CLUGROUP_CULL_DEBUG
+	RootSignature m_gen_vis_node_cull_root_sig;
+	ComputePSO m_gen_vis_node_cull_pso;
+	CommandSignature m_vis_node_cull_cmd_sig;
+
+	StructuredBuffer vis_clu_group_culled_cluster;
+	ByteAddressBuffer vis_cul_group_cmd_num;
+	StructuredBuffer vis_node_cull_indirect_draw_cmd;
+
+	void RenderNodeCullingVisualize();
+#endif
 };

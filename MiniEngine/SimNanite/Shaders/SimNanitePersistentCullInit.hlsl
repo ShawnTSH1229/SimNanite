@@ -23,6 +23,7 @@ void InitPersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIn
 
         uint gloabl_task_write_index = 0;
         InterlockedAdd(queue_pass_state_to_init[0].node_num, root_node_num, gloabl_task_write_index);
+        InterlockedAdd(queue_pass_state_to_init[0].node_task_write_offset, root_node_num);
 
         for(uint write_idx = 0; write_idx < root_node_num; write_idx++)
         {

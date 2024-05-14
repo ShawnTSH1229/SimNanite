@@ -20,9 +20,9 @@ struct SCompiledShaderCode
 class CShaderCompiler
 {
 public:
-	std::shared_ptr<SCompiledShaderCode> Compile(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount);
-	std::shared_ptr<SCompiledShaderCode> CompileDxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount);
-	std::shared_ptr<SCompiledShaderCode> CompileFxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, DxcDefine* dxcDefine, uint32_t defineCount);
+	std::shared_ptr<SCompiledShaderCode> Compile(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount);
+	std::shared_ptr<SCompiledShaderCode> CompileDxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount);
+	std::shared_ptr<SCompiledShaderCode> CompileFxc(const std::wstring& shaderPath, LPCWSTR pEntryPoint, LPCWSTR pTargetProfile, D3D_SHADER_MACRO* fxcDefine, uint32_t defineCount);
 	void Init(bool use_fxc = true);
 private:
 	bool m_use_fxc;
