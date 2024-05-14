@@ -149,6 +149,11 @@ struct SSimNaniteGlobalResource
 	ByteAddressBuffer m_scene_uv_vertex_buffer;
 	ByteAddressBuffer m_scene_index_buffer;
 
+	/* Rasterization */
+	StructuredBuffer hardware_indirect_draw_cmds;
+	ByteAddressBuffer hardware_indirect_draw_num;
+	StructuredBuffer hardware_draw_indirect;
+
 	// Visualize Cluster Group
 	StructuredBuffer m_cluster_group_cull_vis;
 	ByteAddressBuffer m_cluster_group_culled_num;

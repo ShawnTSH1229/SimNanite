@@ -153,6 +153,21 @@ void CSimNaniteVisualizer::Init()
         vis_node_cull_indirect_draw_cmd.Create(L"vis_node_cull_indirect_draw_cmd", 1, sizeof(D3D12_DRAW_ARGUMENTS));
     }
 #endif
+
+    {
+        m_copy_buffer_sig.Reset(3);
+        m_copy_buffer_sig[0].InitAsConstantBuffer(0);
+        m_copy_buffer_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1);
+        m_copy_buffer_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+        m_copy_buffer_sig.Finalize(L"m_copy_buffer_sig");
+
+        std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteVisualizeRenderTarget.hlsl", L"CopyVisBufferToDestVisualizeRT", L"cs_5_1", nullptr, 0);
+
+        m_copy_buffer_pso = ComputePSO(L"m_copy_buffer_pso");
+        m_copy_buffer_pso.SetRootSignature(m_copy_buffer_sig);
+        m_copy_buffer_pso.SetComputeShader(p_cs_shader_code->GetBufferPointer(), p_cs_shader_code->GetBufferSize());
+        m_copy_buffer_pso.Finalize();
+    }
 }
 
 void CSimNaniteVisualizer::Render()
@@ -173,6 +188,10 @@ void CSimNaniteVisualizer::Render()
         RenderNodeCullingVisualize();
     }
 #endif
+    else if (GetSimNaniteGlobalResource().vis_type == 4)
+    {
+        RenderVisualizeBuffer();
+    }
     else
     {
         RenderClusterVisualize();
@@ -404,4 +423,21 @@ void CSimNaniteVisualizer::RenderNodeCullingVisualize()
 
     gfxContext.Finish();
 }
+
 #endif
+
+void CSimNaniteVisualizer::RenderVisualizeBuffer()
+{
+    ComputeContext& cptContext = ComputeContext::Begin(L"RenderVisualizeBuffer");
+
+    cptContext.SetRootSignature(m_copy_buffer_sig);
+    cptContext.SetPipelineState(m_copy_buffer_pso);
+
+    cptContext.SetConstantBuffer(0, GetSimNaniteGlobalResource().m_view_constant_address);
+
+    cptContext.SetDynamicDescriptors(1, 0, 1, &g_VisibilityBuffer.GetSRV());
+    cptContext.SetDynamicDescriptors(2, 0, 1, &g_SceneColorBuffer.GetUAV());
+
+    cptContext.Dispatch((GetSimNaniteGlobalResource().m_MainViewport.Width + 7) / 8, (GetSimNaniteGlobalResource().m_MainViewport.Height + 7) / 8, 1);
+    cptContext.Finish();
+}

@@ -62,4 +62,10 @@ private:
 
 	void RenderNodeCullingVisualize();
 #endif
+
+	// visualize buffer vis buffer
+	RootSignature m_copy_buffer_sig;
+	ComputePSO m_copy_buffer_pso;
+
+	void RenderVisualizeBuffer();
 };

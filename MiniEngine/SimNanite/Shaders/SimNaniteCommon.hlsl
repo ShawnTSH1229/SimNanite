@@ -82,7 +82,7 @@ struct SSimNaniteClusterDraw
     uint start_index_location;
     uint start_vertex_location;
 
-    float padding_0;
+    uint material_idx;
 };
 
 //typedef struct D3D12_DRAW_ARGUMENTS

@@ -127,6 +127,9 @@
     <ClCompile Include="SimNaniteBuilder\SimNaniteBuildBVH.cpp">
       <Filter>Source Files\NaniteBuilder</Filter>
     </ClCompile>
+    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterization.cpp">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -193,6 +196,9 @@
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCulling.h">
+      <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterization.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
   </ItemGroup>

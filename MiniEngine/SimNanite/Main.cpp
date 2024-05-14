@@ -28,6 +28,7 @@
 #include "SimNaniteRuntime/SimNanitePersistentCulling.h"
 #include "SimNaniteRuntime/SimNaniteGlobalResource.h"
 #include "SimNaniteRuntime/SimNaniteVisualize.h"
+#include "SimNaniteRuntime/SimNaniteRasterization.h"
 
 //deprecated
 //#include "SimNaniteRuntime/SimNaniteCull.h"
@@ -64,6 +65,7 @@ private:
     CSimNaniteInstanceCulling m_instance_culling;
     CPersistentCulling m_persistent_culling;
     CSimNaniteVisualizer m_nanite_visualizer;
+    CRasterizationPass m_nanite_rasterizer;
 
 #if DEBUG_TEST
     CNaniteCuller m_nanite_culler;
@@ -112,6 +114,7 @@ void SimNaniteApp::Startup(void)
     m_nanite_visualizer.Init();
     m_instance_culling.Init();
     m_persistent_culling.Init();
+    m_nanite_rasterizer.Init();
 
 #if 0
     SNaniteCullInitDesc culler_init_desc;
@@ -158,25 +161,6 @@ void SimNaniteApp::Update(float deltaT)
 #endif
     m_CameraController->Update(deltaT);
 
-    if (GameInput::IsFirstPressed(GameInput::kKey_5))
-    {
-        GetSimNaniteGlobalResource().m_vis_cluster_lod++;
-    }
-
-    if (GameInput::IsFirstPressed(GameInput::kKey_2))
-    {
-        GetSimNaniteGlobalResource().m_vis_cluster_lod--;
-    }
-
-    if (GameInput::IsFirstPressed(GameInput::kKey_7))
-    {
-        GetSimNaniteGlobalResource().vis_type = 7;
-    }
-
-    if (GameInput::IsFirstPressed(GameInput::kKey_6))
-    {
-        GetSimNaniteGlobalResource().vis_type = 6;
-    }
 
     if (GameInput::IsFirstPressed(GameInput::kKey_0))
     {
@@ -187,6 +171,33 @@ void SimNaniteApp::Update(float deltaT)
     {
         GetSimNaniteGlobalResource().m_need_update_freezing_data = true;
     }
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_2))
+    {
+        GetSimNaniteGlobalResource().m_vis_cluster_lod--;
+    }
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_4))
+    {
+        GetSimNaniteGlobalResource().vis_type = 4;
+    }
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_5))
+    {
+        GetSimNaniteGlobalResource().m_vis_cluster_lod++;
+    }
+
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_6))
+    {
+        GetSimNaniteGlobalResource().vis_type = 6;
+    }
+
+    if (GameInput::IsFirstPressed(GameInput::kKey_7))
+    {
+        GetSimNaniteGlobalResource().vis_type = 7;
+    }
+
 
     const Vector3 cam_position = m_Camera.GetPosition();
     SCullingParameters& culling_parameters = GetSimNaniteGlobalResource().m_culling_parameters;
@@ -221,8 +232,6 @@ void SimNaniteApp::RenderScene(void)
 
     cptContext.Finish();
     
-    
-    
+    m_nanite_rasterizer.Rasterization();
     m_nanite_visualizer.Render();
-  
 }
