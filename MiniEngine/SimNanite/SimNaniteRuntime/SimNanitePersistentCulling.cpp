@@ -74,6 +74,20 @@ void CPersistentCulling::Init()
 		hardware_indirect_pso.SetComputeShader(p_cs_shader_code->GetBufferPointer(), p_cs_shader_code->GetBufferSize());
 		hardware_indirect_pso.Finalize();
 	}
+
+	{
+		cluster_cull_sig.Reset(2, 0);
+		cluster_cull_sig[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 5);
+		cluster_cull_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 2);
+		cluster_cull_sig.Finalize(L"cluster_cull_sig");
+
+		std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteClusterCull.hlsl", L"ClusterCull", L"cs_5_1", nullptr, 0);
+
+		cluster_cull_pso = ComputePSO(L"cluster_cull_pso");
+		cluster_cull_pso.SetRootSignature(cluster_cull_sig);
+		cluster_cull_pso.SetComputeShader(p_cs_shader_code->GetBufferPointer(), p_cs_shader_code->GetBufferSize());
+		cluster_cull_pso.Finalize();
+	}
 }
 
 void CPersistentCulling::GPUCull(ComputeContext& Context)
@@ -177,6 +191,23 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.SetDynamicDescriptors(2, 3, 1, &GetSimNaniteGlobalResource().m_cluster_group_culled_num.GetUAV());
 #endif
 		Context.DispatchIndirect(persistent_cull_indirect_cmd);
+	}
+
+	{
+		Context.SetRootSignature(cluster_cull_sig);
+		Context.SetPipelineState(cluster_cull_pso);
+
+		Context.TransitionResource(GetSimNaniteGlobalResource().m_queue_pass_state, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		Context.TransitionResource(m_cluster_task_queue, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		Context.TransitionResource(m_cluster_task_batch_size, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		Context.TransitionResource(GetSimNaniteGlobalResource().m_scene_cluster_infos, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		Context.FlushResourceBarriers();
+
+		Context.SetDynamicDescriptors(0, 0, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_num.GetSRV());
+		Context.SetDynamicDescriptors(1, 0, 1, &GetSimNaniteGlobalResource().hardware_draw_indirect.GetUAV());
+
+		Context.Dispatch(1, 1, 1);
 	}
 
 	// generate draw indirect command

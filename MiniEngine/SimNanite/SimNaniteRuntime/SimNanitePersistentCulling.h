@@ -26,6 +26,10 @@ private:
 	ByteAddressBuffer m_cluster_task_queue;
 	ByteAddressBuffer m_cluster_task_batch_size;
 
+	// cluster cull
+	RootSignature cluster_cull_sig;
+	ComputePSO cluster_cull_pso;
+
 	// hardware indirect dispatch
 	RootSignature hardware_indirect_root_sig;
 	ComputePSO hardware_indirect_pso;
