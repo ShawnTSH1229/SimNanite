@@ -35,7 +35,7 @@ void CPersistentCulling::Init()
 #if CLUGROUP_CULL_DEBUG
 		persistent_cull_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 4);
 #else
-		persistent_cull_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 6);
+		persistent_cull_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 7);
 #endif
 		persistent_cull_sig.Finalize(L"persistent_cull_sig");
 
@@ -63,8 +63,8 @@ void CPersistentCulling::Init()
 	{
 
 		hardware_indirect_root_sig.Reset(2, 0);
-		hardware_indirect_root_sig[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1);
-		hardware_indirect_root_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+		hardware_indirect_root_sig[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
+		hardware_indirect_root_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 2);
 		hardware_indirect_root_sig.Finalize(L"hardware_indirect_root_sig");
 
 		std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteGenerateIndirectCmd.hlsl", L"HardwareIndirectDrawGen", L"cs_5_1", nullptr, 0);
@@ -76,9 +76,10 @@ void CPersistentCulling::Init()
 	}
 
 	{
-		cluster_cull_sig.Reset(2, 0);
-		cluster_cull_sig[0].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 5);
-		cluster_cull_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 2);
+		cluster_cull_sig.Reset(3, 0);
+		cluster_cull_sig[0].InitAsConstantBuffer(0);
+		cluster_cull_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 5);
+		cluster_cull_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 3);
 		cluster_cull_sig.Finalize(L"cluster_cull_sig");
 
 		std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteClusterCull.hlsl", L"ClusterCull", L"cs_5_1", nullptr, 0);
@@ -156,8 +157,9 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.TransitionResource(GetSimNaniteGlobalResource().m_queue_pass_state, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		Context.TransitionResource(m_cluster_task_queue, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		Context.TransitionResource(m_cluster_task_batch_size, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-		Context.TransitionResource(GetSimNaniteGlobalResource().hardware_indirect_draw_cmds, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		Context.TransitionResource(GetSimNaniteGlobalResource().scene_indirect_draw_cmds, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		Context.TransitionResource(GetSimNaniteGlobalResource().hardware_indirect_draw_num, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		Context.TransitionResource(GetSimNaniteGlobalResource().software_indirect_draw_num, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 #if CLUGROUP_CULL_DEBUG
 		Context.TransitionResource(GetSimNaniteGlobalResource().m_cluster_group_cull_vis, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -169,6 +171,7 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.ClearUAV(m_cluster_task_queue);
 		Context.ClearUAV(m_cluster_task_batch_size);
 		Context.ClearUAV(GetSimNaniteGlobalResource().hardware_indirect_draw_num);
+		Context.ClearUAV(GetSimNaniteGlobalResource().software_indirect_draw_num);
 
 		Context.SetDynamicConstantBufferView(0, sizeof(SCullingParameters), &GetSimNaniteGlobalResource().m_culling_parameters);
 
@@ -183,8 +186,9 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.SetDynamicDescriptors(2, 1, 1, &GetSimNaniteGlobalResource().m_queue_pass_state.GetUAV());
 		Context.SetDynamicDescriptors(2, 2, 1, &m_cluster_task_queue.GetUAV());
 		Context.SetDynamicDescriptors(2, 3, 1, &m_cluster_task_batch_size.GetUAV());
-		Context.SetDynamicDescriptors(2, 4, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_cmds.GetUAV());
+		Context.SetDynamicDescriptors(2, 4, 1, &GetSimNaniteGlobalResource().scene_indirect_draw_cmds.GetUAV());
 		Context.SetDynamicDescriptors(2, 5, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_num.GetUAV());
+		Context.SetDynamicDescriptors(2, 6, 1, &GetSimNaniteGlobalResource().software_indirect_draw_num.GetUAV());
 
 #if CLUGROUP_CULL_DEBUG
 		Context.SetDynamicDescriptors(2, 2, 1, &GetSimNaniteGlobalResource().m_cluster_group_cull_vis.GetUAV());
@@ -193,6 +197,7 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.DispatchIndirect(persistent_cull_indirect_cmd);
 	}
 
+	// cluster cull
 	{
 		Context.SetRootSignature(cluster_cull_sig);
 		Context.SetPipelineState(cluster_cull_pso);
@@ -201,13 +206,27 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 		Context.TransitionResource(m_cluster_task_queue, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 		Context.TransitionResource(m_cluster_task_batch_size, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 		Context.TransitionResource(GetSimNaniteGlobalResource().m_scene_cluster_infos, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		Context.TransitionResource(GetSimNaniteGlobalResource().m_culled_ins_scene_data_gpu, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		Context.TransitionResource(GetSimNaniteGlobalResource().scene_indirect_draw_cmds, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		Context.TransitionResource(GetSimNaniteGlobalResource().hardware_indirect_draw_num, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		Context.FlushResourceBarriers();
 
-		Context.SetDynamicDescriptors(0, 0, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_num.GetSRV());
-		Context.SetDynamicDescriptors(1, 0, 1, &GetSimNaniteGlobalResource().hardware_draw_indirect.GetUAV());
+		Context.SetDynamicConstantBufferView(0, sizeof(SCullingParameters), &GetSimNaniteGlobalResource().m_culling_parameters);
 
-		Context.Dispatch(1, 1, 1);
+		Context.SetDynamicDescriptors(1, 0, 1, &GetSimNaniteGlobalResource().m_queue_pass_state.GetSRV());
+		Context.SetDynamicDescriptors(1, 1, 1, &m_cluster_task_queue.GetSRV());
+		Context.SetDynamicDescriptors(1, 2, 1, &m_cluster_task_batch_size.GetSRV());
+		Context.SetDynamicDescriptors(1, 3, 1, &GetSimNaniteGlobalResource().m_scene_cluster_infos.GetSRV());
+		Context.SetDynamicDescriptors(1, 4, 1, &GetSimNaniteGlobalResource().m_culled_ins_scene_data_gpu.GetSRV());
+
+		Context.SetDynamicDescriptors(2, 0, 1, &GetSimNaniteGlobalResource().scene_indirect_draw_cmds.GetUAV());
+		Context.SetDynamicDescriptors(2, 1, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_num.GetUAV());
+		Context.SetDynamicDescriptors(2, 2, 1, &GetSimNaniteGlobalResource().software_indirect_draw_num.GetUAV());
+
+		// 320 clusters
+		Context.Dispatch(10, 1, 1);
 	}
 
 	// generate draw indirect command
@@ -217,11 +236,15 @@ void CPersistentCulling::GPUCull(ComputeContext& Context)
 
 		Context.TransitionResource(GetSimNaniteGlobalResource().hardware_indirect_draw_num, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 		Context.TransitionResource(GetSimNaniteGlobalResource().hardware_draw_indirect, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		Context.TransitionResource(GetSimNaniteGlobalResource().software_indirect_draw_num, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		Context.TransitionResource(GetSimNaniteGlobalResource().software_draw_indirect, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 		Context.FlushResourceBarriers();
 
 		Context.SetDynamicDescriptors(0, 0, 1, &GetSimNaniteGlobalResource().hardware_indirect_draw_num.GetSRV());
+		Context.SetDynamicDescriptors(0, 1, 1, &GetSimNaniteGlobalResource().software_indirect_draw_num.GetSRV());
 		Context.SetDynamicDescriptors(1, 0, 1, &GetSimNaniteGlobalResource().hardware_draw_indirect.GetUAV());
+		Context.SetDynamicDescriptors(1, 1, 1, &GetSimNaniteGlobalResource().software_draw_indirect.GetUAV());
 
 		Context.Dispatch(1, 1, 1);
 	}

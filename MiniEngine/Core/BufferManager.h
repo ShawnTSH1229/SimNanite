@@ -30,7 +30,7 @@ namespace Graphics
 
     //SimNanite:BEGIN
     extern ColorBuffer g_VisibilityBuffer;
-    extern ColorBuffer g_RasterizationDepthUAV;
+    extern ColorBuffer g_IntermediateDepth;
     extern DepthBuffer g_RasterizationDepth;
 
     extern ColorBuffer g_MatIdBuffer;

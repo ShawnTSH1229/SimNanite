@@ -43,18 +43,22 @@ bool IsBackFace(float3 v0, float3 v1, float3 v2)
     return normal.z > 0;
 }
 
-StructuredBuffer<SSimNaniteClusterDraw> software_instance_cluster: register(t0);
+StructuredBuffer<SSimNaniteClusterDraw> scene_instance_cluster: register(t0);
 ByteAddressBuffer global_vertex_pos_buffer : register(t1);
 ByteAddressBuffer global_index_buffer : register(t2);
+
+RWTexture2D<uint> intermediate_depth_buffer: register(u0);
+RWTexture2D<uint> out_vis_buffer: register(u1);
+RWTexture2D<uint> out_mat_id_buffer: register(u2);
 
 // cluster instance num * 1 * 1
 [numthreads(GROUP_SIZEX, GROUP_SIZEY, 1)]
 void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
 {
-    uint instance_id = groupId.x;
+    uint instance_id = groupId.x + SIMNANITE_SOFTWARE_OFFSET;
     uint triangle_index = groupIndex;
 
-    SSimNaniteClusterDraw cluster_draw = software_instance_cluster[instance_id];
+    SSimNaniteClusterDraw cluster_draw = scene_instance_cluster[instance_id];
     
     uint index_count = cluster_draw.index_count;
     uint start_index_location = cluster_draw.start_index_location;
@@ -113,31 +117,42 @@ void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_Grou
                     {
                         float depth = barycentric.x * screen_pos_a.z + barycentric.y * screen_pos_b.z + barycentric.z * screen_pos_c.z;
 
-                        
+                        uint depth_uint = depth * 0x7FFFFFFFu;
+                        uint2 pixel_pos = uint2(x,y);
+                        uint pre_depth;
+                        InterlockedMax(intermediate_depth_buffer[pixel_pos], depth_uint, pre_depth);
+                        if (depth_uint > pre_depth)
+                        {
+                            uint triangle_id = triangle_index;
+                            uint visibility_value = triangle_id & 0x0000FFFFu;
+                            visibility_value = visibility_value | uint(instance_id << 16u);
 
+                            out_vis_buffer[pixel_pos] = visibility_value;
+                            out_mat_id_buffer[pixel_pos] = cluster_draw.material_idx;
+                        }
                     }
                 }
-                // dest pixel validation
             }
         }
-
-
     }
+}
 
-    if(vertex_id < index_count)
-    {
-        uint index_read_pos = start_index_location + vertex_id;
+Texture2D<float> src_depth_buffer: register(t0);
 
-        uint vertex_index_idx = global_index_buffer.Load(index_read_pos * 4/*sizeof int*/);
-        uint vertex_idx = vertex_index_idx + start_vertex_location;
+void intermediate_depth_buffer_gen_vs(
+    in uint VertID : SV_VertexID,
+    out float2 Tex : TexCoord0,
+    out float4 Pos : SV_Position)
+{
+    // Texture coordinates range [0, 2], but only [0, 1] appears on screen.
+    Tex = float2(uint2(VertID, VertID << 1) & 2);
+    Pos = float4(lerp(float2(-1, 1), float2(1, -1), Tex), 0.0, 1);
+}
 
-        float3 vertex_position = asfloat(global_vertex_pos_buffer.Load3((vertex_idx * 3)* 4/*sizeof int*/));
-
-        uint visibility_value = vertex_idx & 0x0000FFFFu;
-        visibility_value = visibility_value | uint(instance_id << 16u);
-
-        float4 position = float4(vertex_position, 1.0);
-        float3 worldPos = mul(cluster_draw.world_matrix, position).xyz;
-
-    }
+uint intermediate_depth_buffer_gen_ps(in float2 Tex: TexCoord0) : SV_Target0
+{
+    uint2 load_pos = Tex.xy * rendertarget_size;
+    float depth_value = src_depth_buffer.Load(int3(load_pos.xy,0));
+    uint depth_uint =  depth_value * 0x7FFFFFFFu;
+    return depth_uint;
 }

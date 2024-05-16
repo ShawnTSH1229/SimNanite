@@ -22,35 +22,35 @@ void CSimHardwareRasterizer::Rasterizer(GraphicsContext& Context, SNaniteRasteri
 	m_scissor.right = (LONG)g_VisibilityBuffer.GetWidth();
 	m_scissor.bottom = (LONG)g_VisibilityBuffer.GetHeight();
 
-	{
-		Context.SetRootSignature(depth_resolve_root_sig);
-		Context.SetPipelineState(depth_resolvepso);
-		Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		Context.TransitionResource(g_RasterizationDepthUAV, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-		Context.TransitionResource(g_RasterizationDepth, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		Context.ClearDepth(g_RasterizationDepth);
-		Context.SetDynamicDescriptor(1, 0, g_RasterizationDepthUAV.GetSRV());
-
-		Context.SetDepthStencilTarget(g_RasterizationDepth.GetDSV());
-		Context.SetViewportAndScissor(m_view_port, m_scissor);
-		Context.Draw(3);
-	}
-
-	{
-		Context.SetRootSignature(nanite_draw_indirect_root_sig);
-		Context.SetPipelineState(nanite_draw_indirect_pso);
-		Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		Context.TransitionResource(g_VisibilityBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		Context.TransitionResource(g_RasterizationDepth, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-		Context.SetRenderTarget(g_VisibilityBuffer.GetRTV(), g_RasterizationDepth.GetDSV());
-		Context.SetViewportAndScissor(m_view_port, m_scissor);
-
-		StructuredBuffer* indirect_cmd = rasterization_context->m_hardware_indirect_draw_command;
-		Context.ExecuteIndirect(nanite_draw_indirect_command_sig, *indirect_cmd, 0, 1024, &indirect_cmd->GetCounterBuffer(), indirect_cmd->GetBufferSize());
-	}
+	//{
+	//	Context.SetRootSignature(depth_resolve_root_sig);
+	//	Context.SetPipelineState(depth_resolvepso);
+	//	Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	//
+	//	Context.TransitionResource(g_RasterizationDepthUAV, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+	//	Context.TransitionResource(g_RasterizationDepth, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	//	Context.ClearDepth(g_RasterizationDepth);
+	//	Context.SetDynamicDescriptor(1, 0, g_RasterizationDepthUAV.GetSRV());
+	//
+	//	Context.SetDepthStencilTarget(g_RasterizationDepth.GetDSV());
+	//	Context.SetViewportAndScissor(m_view_port, m_scissor);
+	//	Context.Draw(3);
+	//}
+	//
+	//{
+	//	Context.SetRootSignature(nanite_draw_indirect_root_sig);
+	//	Context.SetPipelineState(nanite_draw_indirect_pso);
+	//	Context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	//
+	//	Context.TransitionResource(g_VisibilityBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	//	Context.TransitionResource(g_RasterizationDepth, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	//
+	//	Context.SetRenderTarget(g_VisibilityBuffer.GetRTV(), g_RasterizationDepth.GetDSV());
+	//	Context.SetViewportAndScissor(m_view_port, m_scissor);
+	//
+	//	StructuredBuffer* indirect_cmd = rasterization_context->m_hardware_indirect_draw_command;
+	//	Context.ExecuteIndirect(nanite_draw_indirect_command_sig, *indirect_cmd, 0, 1024, &indirect_cmd->GetCounterBuffer(), indirect_cmd->GetBufferSize());
+	//}
 
 
 	HardwareRasterization.Finish();
@@ -124,14 +124,14 @@ void CSimSoftwareRasterizer::Init(SNaniteRasterizerInitDesc& init_desc)
 
 void CSimSoftwareRasterizer::Rasterizer(GraphicsContext& Context, SNaniteRasterizationContext* rasterization_context)
 {
-	ComputeContext& cptContext = ComputeContext::Begin(L"Software Rasterization");
-
-	StructuredBuffer* indirect_cmd = rasterization_context->m_software_indirect_draw_command;
-
-	cptContext.TransitionResource(g_RasterizationDepthUAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	cptContext.ClearUAV(g_RasterizationDepthUAV);
-	cptContext.ExecuteIndirect(nanite_dispatch_command_sig, *indirect_cmd, 0, 1024, &indirect_cmd->GetCounterBuffer(), indirect_cmd->GetBufferSize());
-	cptContext.Finish();
+	//ComputeContext& cptContext = ComputeContext::Begin(L"Software Rasterization");
+	//
+	//StructuredBuffer* indirect_cmd = rasterization_context->m_software_indirect_draw_command;
+	//
+	//cptContext.TransitionResource(g_RasterizationDepthUAV, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	//cptContext.ClearUAV(g_RasterizationDepthUAV);
+	//cptContext.ExecuteIndirect(nanite_dispatch_command_sig, *indirect_cmd, 0, 1024, &indirect_cmd->GetCounterBuffer(), indirect_cmd->GetBufferSize());
+	//cptContext.Finish();
 }
 
 void CSimSoftwareRasterizer::CreatePSO(SNaniteRasterizerInitDesc& init_desc)

@@ -23,11 +23,12 @@ StructuredBuffer<SSimNaniteCluster> scene_cluster_infos: register(t3);//cluster
 
 RWByteAddressBuffer node_task_queue: register(u0);//todo: insert a barrier for waw resource
 globallycoherent RWStructuredBuffer<SQueuePassState> queue_pass_state: register(u1);
-RWByteAddressBuffer cluster_task_queue: register(u2); //todo: clear
-RWByteAddressBuffer cluster_task_batch_size: register(u3); //todo: clear
+RWByteAddressBuffer cluster_task_queue: register(u2);
+RWByteAddressBuffer cluster_task_batch_size: register(u3);
 
-RWStructuredBuffer<SSimNaniteClusterDraw> hardware_indirect_draw_cmd : register(u4); 
-RWByteAddressBuffer hardware_indirect_draw_num : register(u5); //todo: clear
+RWStructuredBuffer<SSimNaniteClusterDraw> scene_indirect_draw_cmd : register(u4); 
+RWByteAddressBuffer hardware_indirect_draw_num : register(u5);
+RWByteAddressBuffer software_indirect_draw_num : register(u6);
 
 #if DEBUG_CLUSTER_GROUP
 RWStructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(u3);
@@ -149,8 +150,8 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
     // cluster cull
     uint clu_task_start_index = 0xFFFFFFFFu;
 
-    //while(true)
-    for(int debug_idx = 0; debug_idx < 2000; debug_idx++)
+    while(true)
+    //for(int debug_idx = 0; debug_idx < 5000; debug_idx++)
     {
         GroupMemoryBarrierWithGroupSync();
         

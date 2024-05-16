@@ -192,9 +192,12 @@ static void InitPersistentCullGPUResource()
 	gSimNaniteResource.m_cluster_group_cull_vis.Create(L"cluster_group_cull_vis", cluster_group_task_num, sizeof(SClusterGroupCullVis));
 	gSimNaniteResource.m_cluster_group_culled_num.Create(L"m_cluster_group_culled_num",1,sizeof(uint32_t));
 
-	gSimNaniteResource.hardware_indirect_draw_cmds.Create(L"hardware_indirect_draw_cmd", 200 * 100, sizeof(SSimNaniteClusterDraw));
+	gSimNaniteResource.scene_indirect_draw_cmds.Create(L"hardware_indirect_draw_cmd", 250 * 100, sizeof(SSimNaniteClusterDraw));
 	gSimNaniteResource.hardware_indirect_draw_num.Create(L"hardware_indirect_draw_num", 1, sizeof(uint32_t));
 	gSimNaniteResource.hardware_draw_indirect.Create(L"hardware_draw_indirect", 1, sizeof(D3D12_DRAW_ARGUMENTS));
+	
+	gSimNaniteResource.software_indirect_draw_num.Create(L"software_indirect_draw_num", 1, sizeof(uint32_t));
+	gSimNaniteResource.software_draw_indirect.Create(L"software_draw_indirect", 1, sizeof(D3D12_DISPATCH_ARGUMENTS));
 }
 
 void InitGlobalResource()

@@ -4,6 +4,8 @@
 // max instance num = 200 ( instance number ) * 4 ( mesh number )
 // max indirect draw command  = max clucster num
 
+#define SIMNANITE_SOFTWARE_OFFSET (200 * 100)
+
 struct SNaniteInstanceSceneData
 {
     float4x4 world_matrix;
@@ -108,6 +110,13 @@ struct SClusterGroupCullVis
 };
 
 struct SPersistentCullIndirectCmd
+{
+    uint thread_group_count_x;
+    uint thread_group_count_y;
+    uint thread_group_count_z;
+};
+
+struct SIndirectDispatchCmd
 {
     uint thread_group_count_x;
     uint thread_group_count_y;

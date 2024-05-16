@@ -44,7 +44,8 @@ VSOutput vs_main(uint vertex_id: SV_VertexID, uint instance_id : SV_InstanceID)
 
         float3 vertex_position = asfloat(global_vertex_pos_buffer.Load3((vertex_idx * 3)* 4/*sizeof int*/));
 
-        uint visibility_value = vertex_idx & 0x0000FFFFu;
+        uint triangle_id = vertex_id / 3;
+        uint visibility_value = triangle_id & 0x0000FFFFu;
         visibility_value = visibility_value | uint(instance_id << 16u);
 
         float4 position = float4(vertex_position, 1.0);

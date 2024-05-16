@@ -27,15 +27,38 @@ void ProcessCluster(uint instance_index,uint clu_idx)
 
     if(!is_culled)
     {
-        uint hardware_write_offset = 0;
-        hardware_indirect_draw_num.InterlockedAdd(0, 1, hardware_write_offset);
-        
-        SSimNaniteClusterDraw cluster_draw = (SSimNaniteClusterDraw)0;
-        cluster_draw.world_matrix = world_matrix;
-        cluster_draw.index_count = scene_clu.index_count;
-        cluster_draw.start_index_location = scene_clu.start_index_location;
-        cluster_draw.start_vertex_location = scene_clu.start_vertex_location;
-        cluster_draw.material_idx = scene_clu.mesh_index + 1;
-        hardware_indirect_draw_cmd[hardware_write_offset] = cluster_draw;
+        bool is_software_rasterrization = false;
+        float dist = distance(bounding_center, camera_world_pos);
+        if(dist > 1000)
+        {
+            is_software_rasterrization = true;
+        }
+
+        if(is_software_rasterrization)
+        {
+            uint software_write_offset = 0;
+            software_indirect_draw_num.InterlockedAdd(0, 1, software_write_offset);
+            
+            SSimNaniteClusterDraw cluster_draw = (SSimNaniteClusterDraw)0;
+            cluster_draw.world_matrix = world_matrix;
+            cluster_draw.index_count = scene_clu.index_count;
+            cluster_draw.start_index_location = scene_clu.start_index_location;
+            cluster_draw.start_vertex_location = scene_clu.start_vertex_location;
+            cluster_draw.material_idx = scene_clu.mesh_index + 1;
+            scene_indirect_draw_cmd[software_write_offset + SIMNANITE_SOFTWARE_OFFSET] = cluster_draw;
+        }
+        else
+        {
+            uint hardware_write_offset = 0;
+            hardware_indirect_draw_num.InterlockedAdd(0, 1, hardware_write_offset);
+
+            SSimNaniteClusterDraw cluster_draw = (SSimNaniteClusterDraw)0;
+            cluster_draw.world_matrix = world_matrix;
+            cluster_draw.index_count = scene_clu.index_count;
+            cluster_draw.start_index_location = scene_clu.start_index_location;
+            cluster_draw.start_vertex_location = scene_clu.start_vertex_location;
+            cluster_draw.material_idx = scene_clu.mesh_index + 1;
+            scene_indirect_draw_cmd[hardware_write_offset] = cluster_draw;
+        }
     }
-}
+};

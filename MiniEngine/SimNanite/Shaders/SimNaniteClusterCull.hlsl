@@ -1,13 +1,21 @@
 #include "SimNaniteCommon.hlsl"
+cbuffer CullingParameters : register(b0)
+{
+    float4 planes[6];
+    uint total_instance_num;
+    float3 camera_world_pos;
+};
 
+#define GROUP_SIZE 32
 StructuredBuffer<SQueuePassState> queue_pass_state : register(t0);
 ByteAddressBuffer cluster_task_queue: register(t1);
 ByteAddressBuffer cluster_task_batch_size: register(t2); 
 StructuredBuffer<SSimNaniteCluster> scene_cluster_infos: register(t3);
 StructuredBuffer<SNaniteInstanceSceneData> culled_instance_scene_data: register(t4);
 
-RWStructuredBuffer<SSimNaniteClusterDraw> hardware_indirect_draw_cmd : register(u0); 
-RWByteAddressBuffer hardware_indirect_draw_num : register(u1); //todo: clear
+RWStructuredBuffer<SSimNaniteClusterDraw> scene_indirect_draw_cmd : register(u0); 
+RWByteAddressBuffer hardware_indirect_draw_num : register(u1);
+RWByteAddressBuffer software_indirect_draw_num : register(u2);
 
 #include "SimNaniteProcessClusterCommon.hlsl"
 
@@ -21,7 +29,7 @@ void ClusterCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
         const uint2 cluster_task = cluster_task_queue.Load2(clu_task_start_idx * 8 /*sizeof(uint2)*/);
         const uint cluster_task_instance_index = cluster_task.x;
         const uint cluster_task_clu_start_index = cluster_task.y;
-        const uint clu_batch_size = cluster_task_batch_size.Load(clu_task_start_index * 4 /*sizeof uint*/);
+        const uint clu_batch_size = cluster_task_batch_size.Load(clu_task_start_idx * 4 /*sizeof uint*/);
         for(uint task_idx = 0; task_idx < clu_batch_size; task_idx++)
         {
             ProcessCluster(cluster_task_instance_index, cluster_task_clu_start_index + task_idx);

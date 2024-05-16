@@ -33,7 +33,7 @@ namespace Graphics
     //SimNanite:BEGIN
     ColorBuffer g_VisibilityBuffer;
     
-    ColorBuffer g_RasterizationDepthUAV;
+    ColorBuffer g_IntermediateDepth;
     DepthBuffer g_RasterizationDepth;
 
     ColorBuffer g_MatIdBuffer;
@@ -127,7 +127,7 @@ void Graphics::InitializeRenderingBuffers( uint32_t bufferWidth, uint32_t buffer
 
         //SimNanite:BEGIN
         g_VisibilityBuffer.Create(L"Visibility Buffer", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
-        g_RasterizationDepthUAV.Create(L"Visibility Depth Buffer UAV", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
+        g_IntermediateDepth.Create(L"g_IntermediateDepth", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
         g_RasterizationDepth.Create(L"Visibility Depth Buffer", bufferWidth, bufferHeight, DSV_FORMAT, esram);
         g_MatIdBuffer.Create(L"Mat ID", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
         g_MaterialIDDepth.Create(L"Material ID Depth", bufferWidth, bufferHeight, DSV_FORMAT, esram);
@@ -271,7 +271,7 @@ void Graphics::DestroyRenderingBuffers()
 
     //SimNanite:BEGIN
     g_VisibilityBuffer.Destroy();
-    g_RasterizationDepthUAV.Destroy();
+    g_IntermediateDepth.Destroy();
     g_RasterizationDepth.Destroy();
     //SimNanite:END
 
