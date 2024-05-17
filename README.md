@@ -25,6 +25,32 @@ During the rasterization pass, we write the **cluster index and triangle index**
 
 2.Compile and run the visual studio solution located in `SimNanite\MiniEngine\SimNanite\SimNanite.sln`
 
+# Source Tree
+
+## SimNaniteBuilder
+
+Offline nanite mesh builder, located at MiniEngine\SimNanite\SimNaniteBuilder
+
+SimNanitePartioner.cpp : Partition the triangle into clusters and partition the clusters into cluster groups
+
+SimNaniteMeshSimplifier.cpp : Simplify the mesh based on the meshoptimizer library
+
+SimNaniteBuildBVH.cpp : Build the cluster group BVH tree
+
+SimNaniteBuildDAG.cpp : Build the cluster group Directed Acyclic Graph
+
+
+## SimNaniteRuntime
+
+located at MiniEngine\SimNanite\SimNaniteRuntime
+
+SimNaniteInstanceCulling.cpp : instance-level culling
+
+SimNanitePersistentCulling.cpp : MPMC BVH node culling and cluster culling
+
+SimNaniteRasterization.cpp : Hardware rasterization and software rasterization
+
+SimNaniteBasePassRendering.cpp : Rendering the scene based on the visibility buffer
 
 # Visualization
 
