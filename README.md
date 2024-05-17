@@ -89,12 +89,6 @@ Instance Culling:
     <img src="/Resource/ins_cull_scene_view.png" width="60%" height="60%">
 </p>
 
-Instance Culling:
-
-<p align="center">
-    <img src="/Resource/ins_cull_scene_view.png" width="60%" height="60%">
-</p>
-
 Visibility Buffer:
 
 <p align="center">
