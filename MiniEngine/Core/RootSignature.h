@@ -127,6 +127,8 @@ public:
 
     static void DestroyAll(void);
 
+    void SetUnFinalized() { m_Finalized = FALSE; };
+
     void Reset( UINT NumRootParams, UINT NumStaticSamplers = 0 )
     {
         if (NumRootParams > 0)

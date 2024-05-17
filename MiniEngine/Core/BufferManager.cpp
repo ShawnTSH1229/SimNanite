@@ -38,6 +38,8 @@ namespace Graphics
 
     ColorBuffer g_MatIdBuffer;
     DepthBuffer g_MaterialIDDepth;
+
+    ColorBuffer g_VisualizeSoftwareRasterization;
     //SimNanite:END
 
     ColorBuffer g_SSAOFullScreen(Color(1.0f, 1.0f, 1.0f));
@@ -131,6 +133,7 @@ void Graphics::InitializeRenderingBuffers( uint32_t bufferWidth, uint32_t buffer
         g_RasterizationDepth.Create(L"Visibility Depth Buffer", bufferWidth, bufferHeight, DSV_FORMAT, esram);
         g_MatIdBuffer.Create(L"Mat ID", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
         g_MaterialIDDepth.Create(L"Material ID Depth", bufferWidth, bufferHeight, DSV_FORMAT, esram);
+        g_VisualizeSoftwareRasterization.Create(L"g_VisualizeSoftwareRasterization", bufferWidth, bufferHeight, 1, DXGI_FORMAT_R32_UINT, esram);
         //SimNanite:END
 
         esram.PushStack();	// Render HDR image

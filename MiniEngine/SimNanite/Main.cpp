@@ -29,11 +29,8 @@
 #include "SimNaniteRuntime/SimNaniteGlobalResource.h"
 #include "SimNaniteRuntime/SimNaniteVisualize.h"
 #include "SimNaniteRuntime/SimNaniteRasterization.h"
+#include "SimNaniteRuntime/SimNaniteBasePassRendering.h"
 
-//deprecated
-//#include "SimNaniteRuntime/SimNaniteCull.h"
-//#include "SimNaniteRuntime/SimNaniteRasterizer.h"
-//#include "SimNaniteRuntime/SimNaniteBasePass.h"
 
 #define DEBUG_TEST 0
 
@@ -66,6 +63,7 @@ private:
     CPersistentCulling m_persistent_culling;
     CSimNaniteVisualizer m_nanite_visualizer;
     CRasterizationPass m_nanite_rasterizer;
+    CBasePassRendering m_base_pass;
 
 #if DEBUG_TEST
     CNaniteCuller m_nanite_culler;
@@ -111,11 +109,11 @@ void SimNaniteApp::Startup(void)
     
     InitGlobalResource();
 
-    m_nanite_visualizer.Init();
     m_instance_culling.Init();
     m_persistent_culling.Init();
     m_nanite_rasterizer.Init();
-
+    m_nanite_visualizer.Init();
+    m_base_pass.Init();
 #if 0
     SNaniteCullInitDesc culler_init_desc;
     culler_init_desc.mesh_instances = &m_mesh_instances;
@@ -233,5 +231,6 @@ void SimNaniteApp::RenderScene(void)
     cptContext.Finish();
     
     m_nanite_rasterizer.Rasterization();
+    m_base_pass.Rendering();
     m_nanite_visualizer.Render();
 }

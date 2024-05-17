@@ -61,7 +61,7 @@ void CRasterizationPass::Init()
         m_software_indirect_draw_sig.Reset(3);
         m_software_indirect_draw_sig[0].InitAsConstantBuffer(0);
         m_software_indirect_draw_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 3, D3D12_SHADER_VISIBILITY_ALL);
-        m_software_indirect_draw_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 3, D3D12_SHADER_VISIBILITY_ALL);
+        m_software_indirect_draw_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 4, D3D12_SHADER_VISIBILITY_ALL);
         m_software_indirect_draw_sig.Finalize(L"m_software_indirect_draw_sig");
 
         std::shared_ptr<SCompiledShaderCode> p_cs_shader_code = GetSimNaniteGlobalResource().m_shader_compiler.Compile(L"Shaders/SimNaniteSoftwareRasterization.hlsl", L"SoftwareRasterization", L"cs_5_1", nullptr, 0);
@@ -151,6 +151,8 @@ void CRasterizationPass::Rasterization()
         cptContext.TransitionResource(g_IntermediateDepth, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
         cptContext.TransitionResource(g_VisibilityBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
         cptContext.TransitionResource(g_MatIdBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+        cptContext.TransitionResource(g_VisualizeSoftwareRasterization, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+        cptContext.ClearUAV(g_VisualizeSoftwareRasterization);
 
         cptContext.FlushResourceBarriers();
 
@@ -163,6 +165,7 @@ void CRasterizationPass::Rasterization()
         cptContext.SetDynamicDescriptors(2, 0, 1, &g_IntermediateDepth.GetUAV());
         cptContext.SetDynamicDescriptors(2, 1, 1, &g_VisibilityBuffer.GetUAV());
         cptContext.SetDynamicDescriptors(2, 2, 1, &g_MatIdBuffer.GetUAV());
+        cptContext.SetDynamicDescriptors(2, 3, 1, &g_VisualizeSoftwareRasterization.GetUAV());
         
         cptContext.DispatchIndirect(GetSimNaniteGlobalResource().software_draw_indirect);
         

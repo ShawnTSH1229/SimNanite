@@ -157,7 +157,7 @@ void CSimNaniteVisualizer::Init()
     {
         m_copy_buffer_sig.Reset(3);
         m_copy_buffer_sig[0].InitAsConstantBuffer(0);
-        m_copy_buffer_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1);
+        m_copy_buffer_sig[1].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
         m_copy_buffer_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
         m_copy_buffer_sig.Finalize(L"m_copy_buffer_sig");
 
@@ -192,7 +192,7 @@ void CSimNaniteVisualizer::Render()
     {
         RenderVisualizeBuffer();
     }
-    else
+    else if(GetSimNaniteGlobalResource().vis_type == 0)
     {
         RenderClusterVisualize();
     }
@@ -436,6 +436,7 @@ void CSimNaniteVisualizer::RenderVisualizeBuffer()
     cptContext.SetConstantBuffer(0, GetSimNaniteGlobalResource().m_view_constant_address);
 
     cptContext.SetDynamicDescriptors(1, 0, 1, &g_VisibilityBuffer.GetSRV());
+    cptContext.SetDynamicDescriptors(1, 1, 1, &g_VisualizeSoftwareRasterization.GetSRV());
     cptContext.SetDynamicDescriptors(2, 0, 1, &g_SceneColorBuffer.GetUAV());
 
     cptContext.Dispatch((GetSimNaniteGlobalResource().m_MainViewport.Width + 7) / 8, (GetSimNaniteGlobalResource().m_MainViewport.Height + 7) / 8, 1);

@@ -1,4 +1,6 @@
 Texture2D<uint> vis_buffer : register(t0);
+Texture2D<uint> software_raster_buffer : register(t1);
+
 RWTexture2D<float4> dest_buffer : register(u0);
 
 cbuffer SNaniteGlobalConstants : register(b0)
@@ -17,6 +19,8 @@ void CopyVisBufferToDestVisualizeRT(uint3 groupId : SV_GroupID, uint groupIndex 
     if(dipatch_thread_id.x < rendertarget_size.x && dipatch_thread_id.y < rendertarget_size.y)
     {
         uint vis_value = vis_buffer.Load(int3(dipatch_thread_id.xy, 0)).x;
+        uint soft_rast = software_raster_buffer.Load(int3(dipatch_thread_id.xy, 0)).x;
+        
         uint clu_idx = vis_value >> 16;
         uint vtx_idx = vis_value & 0x0000FFFFu;
 
@@ -40,6 +44,11 @@ void CopyVisBufferToDestVisualizeRT(uint3 groupId : SV_GroupID, uint groupIndex 
         if(vtx_idx % 5 == 4)
         {
             vis_color.xyz = float3(1,0,1);
+        }
+
+        if(soft_rast == 1)
+        {
+            vis_color.y = 1;
         }
 
         if(vis_value == 0)

@@ -6,7 +6,6 @@ ByteAddressBuffer software_indirect_draw_num : register(t1);
 RWStructuredBuffer<SIndirectDrawParameters>  hardware_draw_indirect: register(u0);
 RWStructuredBuffer<SIndirectDispatchCmd>  software_draw_indirect: register(u1);
 
-
 [numthreads(1, 1, 1)]
 void HardwareIndirectDrawGen(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
 {

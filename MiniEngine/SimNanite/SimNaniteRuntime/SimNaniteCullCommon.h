@@ -15,7 +15,7 @@ __declspec(align(256)) struct SCullingParameters_Deprecated
 	uint32_t total_instance_num;
 };
 
-__declspec(align(256)) struct SBasePassParam
+__declspec(align(256)) struct SBasePassParam_deprecated
 {
     uint32_t material_index;
 };

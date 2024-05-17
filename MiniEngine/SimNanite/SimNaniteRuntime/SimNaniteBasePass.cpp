@@ -75,11 +75,11 @@ void CSimNaniteBasePass::Render(SNaniteBasePassContext* context)
             gfxContext.SetDynamicDescriptor(2, 6, mesh_instance.m_texture.GetSRV());//t6
             gfxContext.SetDescriptorTable(3, (*context->s_SamplerHeap)[mesh_instance.m_sampler_table_idx]);
 
-            SBasePassParam base_pass_params;
-            base_pass_params.material_index = idx;
-            DynAlloc cb = gfxContext.ReserveUploadMemory(sizeof(SBasePassParam));
-            memcpy(cb.DataPtr, &base_pass_params, sizeof(SBasePassParam));
-            gfxContext.SetConstantBuffer(1, cb.GpuAddress);
+            //SBasePassParam base_pass_params;
+            //base_pass_params.material_index = idx;
+            //DynAlloc cb = gfxContext.ReserveUploadMemory(sizeof(SBasePassParam));
+            //memcpy(cb.DataPtr, &base_pass_params, sizeof(SBasePassParam));
+            //gfxContext.SetConstantBuffer(1, cb.GpuAddress);
 
             gfxContext.FlushResourceBarriers();
 
@@ -120,8 +120,8 @@ void CSimNaniteBasePass::CreatePSO(CSimNaniteBasePassInitDesc* nanite_init_desc)
 
     {
         m_base_pass_root_sig.Reset(4);
-        m_base_pass_root_sig[0].InitAsConstantBuffer(0);
-        m_base_pass_root_sig[1].InitAsConstantBuffer(1);
+        m_base_pass_root_sig[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
+        m_base_pass_root_sig[1].InitAsConstantBuffer(1, D3D12_SHADER_VISIBILITY_PIXEL);
         m_base_pass_root_sig[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 9);
         m_base_pass_root_sig[3].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 0, 1, D3D12_SHADER_VISIBILITY_PIXEL);
         m_base_pass_root_sig.Finalize(L"m_base_pass_root_sig", D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);

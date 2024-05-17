@@ -50,6 +50,7 @@ ByteAddressBuffer global_index_buffer : register(t2);
 RWTexture2D<uint> intermediate_depth_buffer: register(u0);
 RWTexture2D<uint> out_vis_buffer: register(u1);
 RWTexture2D<uint> out_mat_id_buffer: register(u2);
+RWTexture2D<uint> visualize_softrasterization: register(u3); //debug buffer
 
 // cluster instance num * 1 * 1
 [numthreads(GROUP_SIZEX, GROUP_SIZEY, 1)]
@@ -118,7 +119,7 @@ void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_Grou
                         float depth = barycentric.x * screen_pos_a.z + barycentric.y * screen_pos_b.z + barycentric.z * screen_pos_c.z;
 
                         uint depth_uint = depth * 0x7FFFFFFFu;
-                        uint2 pixel_pos = uint2(x,y);
+                        uint2 pixel_pos = uint2(x, rendertarget_size.y - y);
                         uint pre_depth;
                         InterlockedMax(intermediate_depth_buffer[pixel_pos], depth_uint, pre_depth);
                         if (depth_uint > pre_depth)
@@ -129,6 +130,7 @@ void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_Grou
 
                             out_vis_buffer[pixel_pos] = visibility_value;
                             out_mat_id_buffer[pixel_pos] = cluster_draw.material_idx;
+                            visualize_softrasterization[pixel_pos] = 1;
                         }
                     }
                 }

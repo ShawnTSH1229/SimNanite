@@ -35,6 +35,8 @@ namespace Graphics
 
     extern ColorBuffer g_MatIdBuffer;
     extern DepthBuffer g_MaterialIDDepth;
+
+    extern ColorBuffer g_VisualizeSoftwareRasterization;
     //SimNanite:END
 
     extern ColorBuffer g_VelocityBuffer;    // R10G10B10  (3D velocity)

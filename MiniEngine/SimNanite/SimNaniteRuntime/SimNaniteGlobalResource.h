@@ -11,6 +11,11 @@
 
 #define CLUGROUP_CULL_DEBUG 0
 
+__declspec(align(256)) struct SBasePassParam
+{
+	uint32_t material_index;
+};
+
 __declspec(align(256)) struct SCullingParameters
 {
 	Math::BoundingPlane m_planes[6];
@@ -168,11 +173,12 @@ struct SSimNaniteGlobalResource
 	// 1 update freezing data
 	
 	// 7 : visualize instance culling
+	// 4 : 
 	// 0 : default, visualize cluster
 	int m_vis_cluster_lod = 0;
 	bool m_need_update_freezing_data = true;
 
-	int vis_type = 0;
+	int vis_type = -1;
 };
 
 SSimNaniteGlobalResource& GetSimNaniteGlobalResource();

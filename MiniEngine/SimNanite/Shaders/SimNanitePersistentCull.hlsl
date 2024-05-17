@@ -21,7 +21,7 @@ StructuredBuffer<SNaniteInstanceSceneData> culled_instance_scene_data: register(
 
 StructuredBuffer<SSimNaniteCluster> scene_cluster_infos: register(t3);//cluster
 
-RWByteAddressBuffer node_task_queue: register(u0);//todo: insert a barrier for waw resource
+RWByteAddressBuffer node_task_queue: register(u0);
 globallycoherent RWStructuredBuffer<SQueuePassState> queue_pass_state: register(u1);
 RWByteAddressBuffer cluster_task_queue: register(u2);
 RWByteAddressBuffer cluster_task_batch_size: register(u3);
@@ -31,8 +31,8 @@ RWByteAddressBuffer hardware_indirect_draw_num : register(u5);
 RWByteAddressBuffer software_indirect_draw_num : register(u6);
 
 #if DEBUG_CLUSTER_GROUP
-RWStructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(u3);
-RWByteAddressBuffer cluster_group_culled_num: register(u4); //todo: clear
+RWStructuredBuffer<SClusterGroupCullVis> cluster_group_cull_vis: register(u7);
+RWByteAddressBuffer cluster_group_culled_num: register(u8);
 #endif
 
 // node cull task
@@ -103,19 +103,10 @@ void ProcessNode(uint instance_index,uint node_index)
 
                 uint clu_start_idx = scene_cluster_group_infos[clu_group_index].cluster_start_index;
                 uint2 write_cluster_task = uint2(instance_index, clu_start_idx);
-    
-                cluster_task_batch_size.Store(write_offset * 4 /*sizeof(uint)*/, child_cluster_num);
-                cluster_task_queue.Store2(write_offset * 8 /* sizeof(uint2)*/, write_cluster_task);
 
                 // assume cluster batch size < 32
-                //for(uint idx = 0; idx < cluster_batch_size - 1; idx +1)
-                //{
-                //    uint clu_start_idx = scene_cluster_group_infos[clu_group_index].cluster_start_index + idx * GROUP_SIZE;
-                //    uint2 write_cluster_task = uint2(clu_start_idx,instance_index);
-                //
-                //    cluster_task_batch_size.Store(write_offset + idx,GROUP_SIZE);
-                //    cluster_task_queue.Store2(write_offset + idx,write_cluster_task);
-                //}
+                cluster_task_batch_size.Store(write_offset * 4 /*sizeof(uint)*/, child_cluster_num);
+                cluster_task_queue.Store2(write_offset * 8 /* sizeof(uint2)*/, write_cluster_task);
             }
         }
         else
@@ -150,8 +141,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
     // cluster cull
     uint clu_task_start_index = 0xFFFFFFFFu;
 
-    while(true)
-    //for(int debug_idx = 0; debug_idx < 5000; debug_idx++)
+    for(int debug_idx = 0; debug_idx < 2000; debug_idx++)
     {
         GroupMemoryBarrierWithGroupSync();
         
@@ -180,11 +170,11 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
             const uint node_task_index = node_start_idx + node_processed_size + group_index;
             bool is_node_ready = (node_processed_size + group_index) < GROUP_PROCESS_NODE_NUM;
 
-            uint2 group_task = node_task_queue.Load2(node_task_index * 8);
-            is_node_ready = is_node_ready && ((group_task.x != 0) || (group_task.y != 0));
+            uint2 node_task = node_task_queue.Load2(node_task_index * 8);
+            is_node_ready = is_node_ready && ((node_task.x != 0) || (node_task.y != 0));
 
-            const uint group_task_instance_index = group_task.x;
-            const uint group_task_node_index = group_task.y;
+            const uint node_task_instance_index = node_task.x;
+            const uint node_task_node_index = node_task.y;
 
             if(is_node_ready)
             {
@@ -200,7 +190,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
                 batch_node_size = (node_processed_mask == 0xFFFFFFFFu) ? GROUP_SIZE : batch_node_size;
                 if (group_index < uint(batch_node_size))
                 {
-                    ProcessNode(group_task_instance_index, group_task_node_index);
+                    ProcessNode(node_task_instance_index, node_task_node_index);
                     node_task_queue.Store2(node_task_index * 8 /* sizeof(uint2)*/, uint2(0, 0));
                 }
                 node_processed_size += batch_node_size;
@@ -245,9 +235,7 @@ void PersistentCull(uint3 groupId : SV_GroupID, uint groupIndex : SV_GroupIndex)
 
         int node_task_num = group_node_task_num;
         
-        //debug only
-        //if (has_node_task && node_task_num == 0)
-        if (has_node_task && node_task_num <= 0)
+        if (has_node_task && node_task_num == 0)
         {
             has_node_task = false;
         }
