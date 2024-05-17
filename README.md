@@ -13,7 +13,7 @@ This is a simplified Nanite implementation **(SimNanite)** based on Unreal's Nan
 
 In offline, we partition the triangles into **clusters** with the **Metis** graph partition library. Then, SimNanite partition the clusters into **cluster groups**, builds the **DAG** (Directed Acyclic Graph) and **BVH tree** based on the cluster groups. In order to avoid the **LOD crack**, SimNanite simplify the mesh globally rather than simplify the triangles per cluster.
 
-At runtime, we implement a three-level GPU culling pipeline, **instance culling**, **BVH node culling** and **cluster culling**. In the BVH node culling pass, we use the **MPMC ( Multiple Producers, Single Consumer )** model to transverse the BVH structure and **integrate the cluster culling** into the BVH culling shader for **work balance**. 
+At runtime, we implement a three-level GPU culling pipeline: **instance culling**, **BVH node culling** and **cluster culling**. In the BVH node culling pass, we use the **MPMC ( Multiple Producers, Single Consumer )** model to transverse the BVH structure and **integrate the cluster culling** into the BVH culling shader for **work balance**. 
 
 We generate an **indirect draw** or **indirect dispatch** command for those clusters that pass the culling. If the cluster is small enough, we employ the **software rasterization** with compute shader.
 
