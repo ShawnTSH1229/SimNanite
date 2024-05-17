@@ -60,6 +60,8 @@ Key 1: Update Freezing Data
 
 Key 2 / 5: decrease/increase cluster visualize lod
 
+Key 4: Visualize Visibility Buffer
+
 Key 6: Visualize Node Culling Result( set DEBUG_CLUSTER_GROUP to 1)
 
 Kay 7: Visualize Instance Culling Result
