@@ -71,61 +71,61 @@ Kay 7: Visualize Instance Culling Result
 Clusters Partition
 
 Clusters LOD0:
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_clu_0.png" width="60%" height="60%">
 </p>
 
 Clusters LOD1:
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_clu_1.png" width="60%" height="60%">
 </p>
 
 Clusters LOD2:
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_clu_2.png" width="60%" height="60%">
 </p>
 
 Instance Culling:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/ins_cull_scene_view.png" width="60%" height="60%">
 </p>
 
 Visibility Buffer:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/visibility_buffer.png" width="60%" height="60%">
 </p>
 
 Hardware Rasterization:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_softraster_hard.png" width="60%" height="60%">
 </p>
 
 
 Software Rasterization:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_softraster_soft.png" width="60%" height="60%">
 </p>
 
 Hardware + Software Rasterization Visibility BUffer:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/vis_softraster_visbuffer.png" width="60%" height="60%">
 </p>
 
 BasePass Rendering + Material Type 0:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/final0.png" width="60%" height="60%">
 </p>
 
 
 BasePass Rendering + Material Type 1 + 0:
 
-<p align="center">
+<p align="left">
     <img src="/Resource/final1.png" width="60%" height="60%">
 </p>
 
