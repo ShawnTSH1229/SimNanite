@@ -68,17 +68,12 @@
     <ClCompile Include="SimNaniteCommon\MeshResource.cpp" />
     <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteBasePassRendering.cpp" />
-    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteGlobalResource.cpp" />
-    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCulling.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp" />
-    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCulling.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteRasterization.cpp" />
-    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp" />
     <ClCompile Include="SimNaniteRuntime\SimNaniteVisualize.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,18 +149,12 @@
     <ClInclude Include="SimNaniteCommon\NaniteUtils.h" />
     <ClInclude Include="SimNaniteCommon\ShaderCompile.h" />
     <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteBasePassRendering.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteGlobalResource.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCulling.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h" />
     <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCulling.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteRasterization.h" />
-    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h" />
     <ClInclude Include="SimNaniteRuntime\SimNaniteVisualize.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

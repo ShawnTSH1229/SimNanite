@@ -94,22 +94,7 @@
     <ClCompile Include="SimNaniteCommon\ShaderCompile.cpp">
       <Filter>Source Files\NaniteCommon</Filter>
     </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteBasePass.cpp">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteCull.cpp">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteInstanceCull.cpp">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClCompile>
     <ClCompile Include="SimNaniteRuntime\SimNaniteMeshInstance.cpp">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNanitePersistentCull.cpp">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClCompile>
-    <ClCompile Include="SimNaniteRuntime\SimNaniteRasterizer.cpp">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClCompile>
     <ClCompile Include="SimNaniteRuntime\SimNaniteVisualize.cpp">
@@ -162,34 +147,13 @@
     <ClInclude Include="SimNaniteCommon\ShaderCompile.h">
       <Filter>Source Files\NaniteCommon</Filter>
     </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteBasePass.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCull.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteInstanceCull.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteMeshInstance.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNanitePersistentCull.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteRasterizer.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteVisualize.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteGlobalResource.h">
-      <Filter>Source Files\NaniteRuntime</Filter>
-    </ClInclude>
-    <ClInclude Include="SimNaniteRuntime\SimNaniteCullCommon.h">
       <Filter>Source Files\NaniteRuntime</Filter>
     </ClInclude>
     <ClInclude Include="SimNaniteCommon\SimNaniteCommon.h">
@@ -206,6 +170,9 @@
     </ClInclude>
     <ClInclude Include="SimNaniteRuntime\SimNaniteBasePassRendering.h">
       <Filter>Source Files\NaniteRuntime</Filter>
+    </ClInclude>
+    <ClInclude Include="SimNaniteBuilder\SimNaniteBuilder.h">
+      <Filter>Source Files\NaniteBuilder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

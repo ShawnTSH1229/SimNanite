@@ -92,6 +92,10 @@ void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_Grou
         float3 ndc_pos_b = float3(clip_pos_b.xyz / clip_pos_b.w);
         float3 ndc_pos_c = float3(clip_pos_c.xyz / clip_pos_c.w);
 
+        ndc_pos_a.y *= -1.0f;
+        ndc_pos_b.y *= -1.0f;
+        ndc_pos_c.y *= -1.0f;
+
         //https://zhuanlan.zhihu.com/p/657809816
         //https://www.cnblogs.com/straywriter/articles/15889297.html
 
@@ -119,7 +123,7 @@ void SoftwareRasterization(uint3 groupId : SV_GroupID, uint groupIndex : SV_Grou
                         float depth = barycentric.x * screen_pos_a.z + barycentric.y * screen_pos_b.z + barycentric.z * screen_pos_c.z;
 
                         uint depth_uint = depth * 0x7FFFFFFFu;
-                        uint2 pixel_pos = uint2(x, rendertarget_size.y - y);
+                        uint2 pixel_pos = uint2(x, y);
                         uint pre_depth;
                         InterlockedMax(intermediate_depth_buffer[pixel_pos], depth_uint, pre_depth);
                         if (depth_uint > pre_depth)

@@ -57,21 +57,11 @@ private:
     Camera m_Camera;
     unique_ptr<CameraController> m_CameraController;
 
-    //SNaniteBasePassContext nanite_base_pass_ctx;
-
     CSimNaniteInstanceCulling m_instance_culling;
     CPersistentCulling m_persistent_culling;
     CSimNaniteVisualizer m_nanite_visualizer;
     CRasterizationPass m_nanite_rasterizer;
     CBasePassRendering m_base_pass;
-
-#if DEBUG_TEST
-    CNaniteCuller m_nanite_culler;
-    CSimNaniteRasterizer m_nanite_rasterizer;
-    CSimNaniteBasePass m_nanite_base_pass;
-
-    SBuildCluster total_mesh_cluster;
-#endif
 };
 
 CREATE_APPLICATION( SimNaniteApp )
@@ -114,25 +104,6 @@ void SimNaniteApp::Startup(void)
     m_nanite_rasterizer.Init();
     m_nanite_visualizer.Init();
     m_base_pass.Init();
-#if 0
-    SNaniteCullInitDesc culler_init_desc;
-    culler_init_desc.mesh_instances = &m_mesh_instances;
-    culler_init_desc.shader_compiler = &m_shader_compiler;
-    culler_init_desc.tex_heap = &s_TextureHeap;
-    culler_init_desc.base_pass_ctx = &nanite_base_pass_ctx;
-    m_nanite_culler.Init(culler_init_desc);
-
-    SNaniteRasterizerInitDesc rasterizer_init_desc;
-    rasterizer_init_desc.shader_compiler = &m_shader_compiler;
-    m_nanite_rasterizer.Init(rasterizer_init_desc);
-
-    CSimNaniteBasePassInitDesc base_pass_init_desc;
-    base_pass_init_desc.m_shader_compiler = &m_shader_compiler;
-    m_nanite_base_pass.Init(&base_pass_init_desc);
-
-    nanite_base_pass_ctx.mesh_instances = &m_mesh_instances;
-    nanite_base_pass_ctx.s_SamplerHeap = &s_SamplerHeap;
-#endif
 }
 
 void SimNaniteApp::Cleanup(void)
@@ -154,9 +125,6 @@ void SimNaniteApp::Update(float deltaT)
     else if (GameInput::IsFirstPressed(GameInput::kRShoulder))
         DebugZoom.Increment();
 
-#if 0
-    m_nanite_culler.UpdataCullingParameters(m_Camera.GetWorldSpaceFrustum(), DirectX::XMFLOAT3(cam_position.GetX(), cam_position.GetY(), cam_position.GetZ()));
-#endif
     m_CameraController->Update(deltaT);
 
 
