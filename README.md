@@ -1,4 +1,4 @@
-# SimNanite[![License](https://img.shields.io/github/license/ShawnTSH1229/SimNanite.svg)](https://github.com/ShawnTSH1229/XEngine/blob/master/LICENSE)
+# SimNanite[![License](https://img.shields.io/github/license/ShawnTSH1229/SimNanite.svg)](https://github.com/ShawnTSH1229/SimLumen/blob/master/LICENSE)
 Simplified Nanite Implementation in MiniEngine
 
 <p align="center">
@@ -66,7 +66,7 @@ Key 6: Visualize Node Culling Result( set DEBUG_CLUSTER_GROUP to 1)
 
 Kay 7: Visualize Instance Culling Result
 
-# Screen Shot
+# Screenshot
 
 Clusters Partition
 
